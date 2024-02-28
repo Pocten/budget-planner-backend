@@ -1,9 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.controller;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
-import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.UserNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
