@@ -1,41 +1,58 @@
 package cz.cvut.fel.budgetplannerbackend.service;
 
+import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.UserNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Transactional
+    public List<UserDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    @Transactional
+    public UserDto getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        return userMapper.toDto(user);
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    @Transactional
+    public UserDto createUser(UserDto userDto) {
+        User user = userMapper.toEntity(userDto);
+        User savedUser = userRepository.save(user);
+        return userMapper.toDto(savedUser);
     }
 
-    public User updateUser(Long id, User user) {
+    @Transactional
+    public UserDto updateUser(Long id, UserDto userDto) {
         if (userRepository.existsById(id)) {
+            User user = userMapper.toEntity(userDto);
             user.setId(id);
-            return userRepository.save(user);
+            User updatedUser = userRepository.save(user);
+            return userMapper.toDto(updatedUser);
         } else {
             throw new UserNotFoundException(id);
         }
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);

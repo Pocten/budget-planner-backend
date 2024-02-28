@@ -58,12 +58,6 @@
             <artifactId>spring-hateoas</artifactId>
         </dependency>
 
-        <!--Mustache-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mustache</artifactId>
-        </dependency>
-
         <!--Database-->
         <dependency>
             <groupId>com.h2database</groupId>
