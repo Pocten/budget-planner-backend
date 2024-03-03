@@ -51,6 +51,11 @@
         </dependency>
 
         <!--Security-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-security</artifactId>-->
+<!--            <version>3.2.3</version>-->
+<!--        </dependency>-->
 
         <!--Hateoas-->
         <dependency>
@@ -125,6 +130,7 @@
                     <url>${DATABASE_URL}</url>
                     <user>${DATABASE_USERNAME}</user>
                     <password>${DATABASE_PASSWORD}</password>
+                    <cleanDisabled>false</cleanDisabled>
                 </configuration>
             </plugin>
 
