@@ -4,11 +4,13 @@ import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Role;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERole;
+import cz.cvut.fel.budgetplannerbackend.exceptions.UserAlreadyExistsException;
 import cz.cvut.fel.budgetplannerbackend.exceptions.UserNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.RoleRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
     public List<UserDto> getAllUsers() {
@@ -40,8 +43,14 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto) throws UserAlreadyExistsException {
         User user = userMapper.toEntity(userDto);
+
+        if (userRepository.findUserByUserName(user.getUserName()).isPresent() || userRepository.findUserByUserEmail(user.getUserEmail()).isPresent()) {
+            throw new UserAlreadyExistsException();
+        }
+
+        user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
         Set<String> strRoles = userDto.roles();
         Set<Role> roles = new HashSet<>();
 

@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 public class Application {
-
-    @GetMapping("/")
-    public String home() {
-        return "Welcome to Budget Planner with CI/CD!";
-    }
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

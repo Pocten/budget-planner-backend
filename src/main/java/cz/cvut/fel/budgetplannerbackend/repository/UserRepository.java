@@ -4,10 +4,12 @@ import cz.cvut.fel.budgetplannerbackend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findUserByUserEmail(String userEmail);
+    Optional<User> findUserByUserEmail(String userEmail);
 
-    User findUserByUserName(String userName);
+    Optional<User> findUserByUserName(String userName);
 }
