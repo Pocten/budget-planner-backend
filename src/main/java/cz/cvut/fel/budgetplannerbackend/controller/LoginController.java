@@ -15,6 +15,11 @@ public class LoginController {
         return "home";
     }
 
+    @GetMapping("/")
+    public String root() {
+        return "home";
+    }
+
     @GetMapping("/hello")
     public String hello() {
         return "hello";
