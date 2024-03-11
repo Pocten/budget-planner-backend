@@ -40,6 +40,13 @@ jobs:
         with:
           token: ${{ secrets.CI_CD_TOKEN }}
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
