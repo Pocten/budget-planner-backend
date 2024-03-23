@@ -1,7 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.controller;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
-import cz.cvut.fel.budgetplannerbackend.exceptions.UserAlreadyExistsException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserAlreadyExistsException;
 import cz.cvut.fel.budgetplannerbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

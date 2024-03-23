@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.exceptions;
+package cz.cvut.fel.budgetplannerbackend.exceptions.user;
 
 public class UserAlreadyExistsException extends RuntimeException {
 
