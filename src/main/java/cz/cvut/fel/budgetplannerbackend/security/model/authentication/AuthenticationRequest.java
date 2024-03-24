@@ -1,10 +1,12 @@
 package cz.cvut.fel.budgetplannerbackend.security.model.authentication;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
+@AllArgsConstructor
 public class AuthenticationRequest {
 
     @NotBlank
@@ -12,4 +14,5 @@ public class AuthenticationRequest {
 
     @NotBlank
     private String userPassword;
+
 }

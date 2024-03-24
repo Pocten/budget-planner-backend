@@ -1,17 +1,21 @@
 package cz.cvut.fel.budgetplannerbackend.security.service;
 
+import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.InvalidCredentialsException;
-import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
+import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.security.jwt.JwtTokenProvider;
 import cz.cvut.fel.budgetplannerbackend.security.model.authentication.AuthenticationRequest;
 import cz.cvut.fel.budgetplannerbackend.security.model.registration.RegistrationRequest;
+import cz.cvut.fel.budgetplannerbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +24,8 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
 
     public String authenticateAndGenerateToken(AuthenticationRequest authenticationRequest) throws InvalidCredentialsException {
@@ -40,11 +45,14 @@ public class AuthenticationService {
     }
 
     public User registerNewUserAccount(RegistrationRequest registrationRequest) {
-        User newUser = new User();
-        newUser.setUserName(registrationRequest.getUserName());
-        newUser.setUserPassword(registrationRequest.getUserPassword());
-        newUser.setUserEmail(registrationRequest.getUserEmail());
-
-        return userRepository.save(newUser);
+        UserDto userDto = new UserDto(
+                null,
+                registrationRequest.getUserName(),
+                registrationRequest.getUserEmail(),
+                registrationRequest.getUserPassword(),
+                LocalDateTime.now(),
+                null);
+        UserDto createdUserDto = userService.createUser(userDto);
+        return userMapper.toEntity(createdUserDto);
     }
 }
