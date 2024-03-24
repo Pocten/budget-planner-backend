@@ -12,7 +12,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**") // Apply to all endpoints
                 .allowedOrigins(
                         "https://budget-planner-frontend-neon.vercel.app/",
-                        "http://localhost:3000"
+                        "http://localhost:3000",
+                        "http://localhost"
                         ) // Allowed Frontend Domain
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
                 .allowCredentials(true); // If you need to send cookies
