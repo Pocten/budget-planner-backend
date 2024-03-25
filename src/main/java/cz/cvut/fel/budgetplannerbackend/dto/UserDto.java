@@ -1,6 +1,5 @@
 package cz.cvut.fel.budgetplannerbackend.dto;
 
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;

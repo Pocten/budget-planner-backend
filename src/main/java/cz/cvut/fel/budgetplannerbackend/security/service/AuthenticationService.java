@@ -7,7 +7,7 @@ import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.security.jwt.JwtTokenProvider;
 import cz.cvut.fel.budgetplannerbackend.security.model.authentication.AuthenticationRequest;
 import cz.cvut.fel.budgetplannerbackend.security.model.registration.RegistrationRequest;
-import cz.cvut.fel.budgetplannerbackend.service.UserService;
+import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,7 +24,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final UserMapper userMapper;
 
 

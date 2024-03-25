@@ -20,14 +20,17 @@ public class CustomUserDetails implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .toList();    }
 
-    @Override
-    public String getPassword() {
-        return user.getUserPassword();
+    public Long getUserId() {
+        return user.getId();
     }
-
     @Override
     public String getUsername() {
         return user.getUserName();
+    }
+
+    @Override
+    public String getPassword() {
+        return user.getUserPassword();
     }
 
     @Override

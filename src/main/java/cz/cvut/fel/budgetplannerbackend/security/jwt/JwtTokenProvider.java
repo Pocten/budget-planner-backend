@@ -2,6 +2,7 @@ package cz.cvut.fel.budgetplannerbackend.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import cz.cvut.fel.budgetplannerbackend.security.model.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +16,12 @@ public class JwtTokenProvider {
     public String generateToken(UserDetails userDetails) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + 864000000); // 10 days
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
 
         return JWT.create()
                 .withSubject(userDetails.getUsername())
+                // Add custom claim with user ID
+                .withClaim("userId", customUserDetails.getUserId())
                 .withIssuedAt(now)
                 .withExpiresAt(expiryDate)
                 .sign(Algorithm.HMAC512(SECRET));

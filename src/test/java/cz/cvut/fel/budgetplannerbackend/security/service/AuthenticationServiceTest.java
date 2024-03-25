@@ -6,7 +6,7 @@ import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.security.jwt.JwtTokenProvider;
 import cz.cvut.fel.budgetplannerbackend.security.model.authentication.AuthenticationRequest;
 import cz.cvut.fel.budgetplannerbackend.security.model.registration.RegistrationRequest;
-import cz.cvut.fel.budgetplannerbackend.service.UserService;
+import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +35,7 @@ class AuthenticationServiceTest {
     private CustomUserDetailsService userDetailsService;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private UserMapper userMapper;

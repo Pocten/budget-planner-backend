@@ -2,7 +2,7 @@ package cz.cvut.fel.budgetplannerbackend.controller;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.service.UserService;
+import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
