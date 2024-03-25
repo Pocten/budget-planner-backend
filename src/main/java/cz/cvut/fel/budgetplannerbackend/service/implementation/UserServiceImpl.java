@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override

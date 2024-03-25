@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +21,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final DashboardRepository dashboardRepository;
     private final DashboardMapper dashboardMapper;
 
-
-    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
 
     @Override
@@ -33,7 +31,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<Dashboard> dashboards = dashboardRepository.findAllByUserId(userId);
         return dashboards.stream()
                 .map(dashboardMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -58,15 +56,21 @@ public class DashboardServiceImpl implements DashboardService {
     @Transactional
     public DashboardDto updateDashboard(Long id, DashboardDto dashboardDto) {
         LOG.info("Updating dashboard with id: {}", id);
-        Dashboard existingDashboard = dashboardRepository.findById(id)
-                .orElseThrow(() -> new DashboardNotFoundException(id));
+        return dashboardRepository.findById(id).map(existingDashboard -> {
+            if (dashboardDto.title() != null) {
+                existingDashboard.setTitle(dashboardDto.title());
+            }
+            if (dashboardDto.description() != null) {
+                existingDashboard.setDescription(dashboardDto.description());
+            }
 
-        //existingDashboard.setTitle(dashboardDto.getTitle());
-        //existingDashboard.setDescription(dashboardDto.getDescription());
-        // Update other fields as necessary
-
-        Dashboard updatedDashboard = dashboardRepository.save(existingDashboard);
-        return dashboardMapper.toDto(updatedDashboard);
+            Dashboard updatedDashboard = dashboardRepository.save(existingDashboard);
+            LOG.info("Updated dashboard with id: {}", id);
+            return dashboardMapper.toDto(updatedDashboard);
+        }).orElseThrow(() -> {
+            LOG.warn("Dashboard with id {} not found", id);
+            return new DashboardNotFoundException(id);
+        });
     }
 
     @Override
