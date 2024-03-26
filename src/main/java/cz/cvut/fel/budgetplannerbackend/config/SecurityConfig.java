@@ -35,6 +35,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow access to Swagger UI first
                         .requestMatchers("/", "/home", "/registration", "/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -7,13 +7,14 @@ import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/dashboards")
+@RequestMapping("/api/v1/users/{userId}/dashboards")
 @RequiredArgsConstructor
 public class DashboardController {
 
@@ -21,15 +22,15 @@ public class DashboardController {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardController.class);
 
     @PostMapping
-    public ResponseEntity<DashboardDto> createDashboard(@RequestBody DashboardDto dashboardDto) {
-        LOG.info("Received request to create a new dashboard");
-        DashboardDto createdDashboard = dashboardService.createDashboard(dashboardDto);
-        LOG.info("Created dashboard with id: {}", createdDashboard.id());
-        return ResponseEntity.status(201).body(createdDashboard);
+    public ResponseEntity<DashboardDto> createDashboard(@PathVariable Long userId, @RequestBody DashboardDto dashboardDto) {
+        LOG.info("Received request to create a new dashboard for user id: {}", userId);
+        DashboardDto createdDashboard = dashboardService.createDashboard(userId, dashboardDto);
+        LOG.info("Created dashboard with id: {} for user id: {}", createdDashboard.id(), userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDashboard);
     }
 
     @GetMapping
-    public ResponseEntity<List<DashboardDto>> getAllDashboardsByUserId(@RequestParam Long userId) { // Измененный метод для получения userId из параметров запроса
+    public ResponseEntity<List<DashboardDto>> getAllDashboardsByUserId(@PathVariable Long userId) {
         LOG.info("Received request to get all dashboards for user id: {}", userId);
         List<DashboardDto> dashboards = dashboardService.getAllDashboardsByUserId(userId);
         LOG.info("Returned all dashboards for user id: {}", userId);
@@ -37,40 +38,40 @@ public class DashboardController {
     }
 
     @GetMapping("/{dashboardId}")
-    public ResponseEntity<DashboardDto> getDashboardById(@PathVariable Long dashboardId) {
-        LOG.info("Received request to get dashboard with id: {}", dashboardId);
+    public ResponseEntity<DashboardDto> getUserDashboardById(@PathVariable Long userId, @PathVariable Long dashboardId) {
+        LOG.info("Received request to get dashboard with id: {} for user id: {}", dashboardId, userId);
         try {
-            DashboardDto dashboardDto = dashboardService.getDashboardById(dashboardId);
-            LOG.info("Returned dashboard with id: {}", dashboardId);
+            DashboardDto dashboardDto = dashboardService.getUserDashboardById(userId, dashboardId);
+            LOG.info("Returned dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.ok(dashboardDto);
         } catch (DashboardNotFoundException e) {
-            LOG.error("Error getting dashboard", e);
+            LOG.error("Error getting dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/{dashboardId}")
-    public ResponseEntity<DashboardDto> updateDashboard(@PathVariable Long dashboardId, @RequestBody DashboardDto dashboardDto) {
-        LOG.info("Received request to update dashboard with id: {}", dashboardId);
+    public ResponseEntity<DashboardDto> updateDashboard(@PathVariable Long userId, @PathVariable Long dashboardId, @RequestBody DashboardDto dashboardDto) {
+        LOG.info("Received request to update dashboard with id: {} for user id: {}", dashboardId, userId);
         try {
-            DashboardDto updatedDashboard = dashboardService.updateDashboard(dashboardId, dashboardDto);
-            LOG.info("Updated dashboard with id: {}", dashboardId);
+            DashboardDto updatedDashboard = dashboardService.updateDashboard(userId, dashboardId, dashboardDto);
+            LOG.info("Updated dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.ok(updatedDashboard);
         } catch (DashboardNotFoundException e) {
-            LOG.error("Error updating dashboard", e);
+            LOG.error("Error updating dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{dashboardId}")
-    public ResponseEntity<Void> deleteDashboard(@PathVariable Long dashboardId) {
-        LOG.info("Received request to delete dashboard with id: {}", dashboardId);
+    public ResponseEntity<Void> deleteDashboard(@PathVariable Long userId, @PathVariable Long dashboardId) {
+        LOG.info("Received request to delete dashboard with id: {} for user id: {}", dashboardId, userId);
         try {
-            dashboardService.deleteDashboard(dashboardId);
-            LOG.info("Deleted dashboard with id: {}", dashboardId);
+            dashboardService.deleteDashboard(userId, dashboardId);
+            LOG.info("Deleted dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.noContent().build();
         } catch (DashboardNotFoundException e) {
-            LOG.error("Error deleting dashboard", e);
+            LOG.error("Error deleting dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
     }

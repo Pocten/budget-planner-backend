@@ -2,9 +2,12 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
+import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.dashboard.DashboardNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.DashboardMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
 import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final DashboardRepository dashboardRepository;
     private final DashboardMapper dashboardMapper;
+    private final UserRepository userRepository;
 
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
@@ -36,48 +40,48 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public DashboardDto getDashboardById(Long id) {
-        LOG.info("Getting dashboard with id: {}", id);
-        Dashboard dashboard = dashboardRepository.findById(id)
+    public DashboardDto getUserDashboardById(Long userId, Long id) {
+        LOG.info("Getting dashboard with id: {} for user id: {}", id, userId);
+        Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new DashboardNotFoundException(id));
         return dashboardMapper.toDto(dashboard);
     }
 
     @Override
     @Transactional
-    public DashboardDto createDashboard(DashboardDto dashboardDto) {
-        LOG.info("Creating a new dashboard");
+    public DashboardDto createDashboard(Long userId, DashboardDto dashboardDto) {
+        LOG.info("Creating a new dashboard for user id: {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Dashboard dashboard = dashboardMapper.toEntity(dashboardDto);
+        dashboard.setUser(user);
         Dashboard savedDashboard = dashboardRepository.save(dashboard);
         return dashboardMapper.toDto(savedDashboard);
     }
 
     @Override
     @Transactional
-    public DashboardDto updateDashboard(Long id, DashboardDto dashboardDto) {
-        LOG.info("Updating dashboard with id: {}", id);
-        return dashboardRepository.findById(id).map(existingDashboard -> {
-            if (dashboardDto.title() != null) {
-                existingDashboard.setTitle(dashboardDto.title());
-            }
-            if (dashboardDto.description() != null) {
-                existingDashboard.setDescription(dashboardDto.description());
-            }
+    public DashboardDto updateDashboard(Long userId, Long id, DashboardDto dashboardDto) {
+        LOG.info("Updating dashboard with id: {} for user id: {}", id, userId);
+        Dashboard existingDashboard = dashboardRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new DashboardNotFoundException(id));
 
-            Dashboard updatedDashboard = dashboardRepository.save(existingDashboard);
-            LOG.info("Updated dashboard with id: {}", id);
-            return dashboardMapper.toDto(updatedDashboard);
-        }).orElseThrow(() -> {
-            LOG.warn("Dashboard with id {} not found", id);
-            return new DashboardNotFoundException(id);
-        });
+        if (dashboardDto.title() != null) {
+            existingDashboard.setTitle(dashboardDto.title());
+        }
+        if (dashboardDto.description() != null) {
+            existingDashboard.setDescription(dashboardDto.description());
+        }
+
+        Dashboard updatedDashboard = dashboardRepository.save(existingDashboard);
+        LOG.info("Updated dashboard with id: {} for user id: {}", updatedDashboard.getId(), userId);
+        return dashboardMapper.toDto(updatedDashboard);
     }
 
     @Override
     @Transactional
-    public void deleteDashboard(Long id) {
-        LOG.info("Deleting dashboard with id: {}", id);
-        Dashboard dashboard = dashboardRepository.findById(id)
+    public void deleteDashboard(Long userId, Long id) {
+        LOG.info("Deleting dashboard with id: {} for user id: {}", id, userId);
+        Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new DashboardNotFoundException(id));
         dashboardRepository.delete(dashboard);
     }
