@@ -1,6 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
+import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.Role;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERole;
@@ -8,6 +9,7 @@ import cz.cvut.fel.budgetplannerbackend.exceptions.role.RoleNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserAlreadyExistsException;
 import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
+import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.RoleRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
 import cz.cvut.fel.budgetplannerbackend.service.UserService;
@@ -27,6 +29,7 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final DashboardRepository dashboardRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -117,6 +120,11 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         LOG.info("Deleting user with id: {}", id);
         if (userRepository.existsById(id)) {
+            List<Dashboard> userDashboards = dashboardRepository.findAllByUserId(id);
+            if (!userDashboards.isEmpty()) {
+                dashboardRepository.deleteAll(userDashboards);
+                LOG.info("Deleted all dashboards for user with id: {}", id);
+            }
             userRepository.deleteById(id);
             LOG.info("Deleted user with id: {}", id);
         } else {
