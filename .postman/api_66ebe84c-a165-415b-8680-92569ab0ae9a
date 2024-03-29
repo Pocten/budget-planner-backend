@@ -9,6 +9,7 @@ id = 66ebe84c-a165-415b-8680-92569ab0ae9a
 
 [config.relations.collections]
 rootDirectory = postman/collections
+files[] = {"id":"19038967-f7e06225-3e5b-4f3f-86ad-0e0be47b69f3","path":"Budget Planner.json","metaData":{}}
 
 [config.relations.collections.metaData]
 
