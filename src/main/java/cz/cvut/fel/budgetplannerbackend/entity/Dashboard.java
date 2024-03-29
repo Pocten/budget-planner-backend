@@ -32,7 +32,6 @@ public class Dashboard {
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated = LocalDateTime.now();
 
-    // Assuming that the User entity is linked with a ManyToOne relationship
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

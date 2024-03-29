@@ -12,6 +12,7 @@ public interface FinancialRecordMapper {
     @Mapping(source = "dashboard.id", target = "dashboardId")
     @Mapping(source = "amount", target = "amount")
     @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "type", target = "type")
     @Mapping(source = "date", target = "date")
     @Mapping(source = "description", target = "description")
     FinancialRecordDto toDto(FinancialRecord financialRecord);
@@ -20,6 +21,7 @@ public interface FinancialRecordMapper {
     @Mapping(source = "dashboardId", target = "dashboard.id")
     @Mapping(source = "amount", target = "amount")
     @Mapping(source = "categoryId", target = "category.id")
+    @Mapping(source = "type", target = "type")
     @Mapping(source = "date", target = "date")
     @Mapping(source = "description", target = "description")
     FinancialRecord toEntity(FinancialRecordDto financialRecordDto);

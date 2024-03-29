@@ -1,5 +1,6 @@
 package cz.cvut.fel.budgetplannerbackend.entity;
 
+import cz.cvut.fel.budgetplannerbackend.entity.enums.ERecordType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,10 @@ public class FinancialRecord {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private ERecordType type;
 
     @CreationTimestamp
     @Column(name = "date", nullable = false)

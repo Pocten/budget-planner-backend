@@ -4,6 +4,7 @@ import cz.cvut.fel.budgetplannerbackend.dto.FinancialRecordDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.ERecordType;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.FinancialRecordMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
@@ -54,6 +55,9 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
         FinancialRecord record = financialRecordMapper.toEntity(financialRecordDto);
         record.setDashboard(dashboard);
+        if (record.getType() == null) {
+            record.setType(ERecordType.INCOME);
+        }
         FinancialRecord savedRecord = financialRecordRepository.save(record);
         return financialRecordMapper.toDto(savedRecord);
     }
@@ -78,6 +82,9 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
             Category category = categoryRepository.findById(financialRecordDto.categoryId())
                     .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.categoryId()));
             record.setCategory(category);
+        }
+        if (financialRecordDto.type() != null) {
+            record.setType(financialRecordDto.type());
         }
 
         FinancialRecord updatedRecord = financialRecordRepository.save(record);
