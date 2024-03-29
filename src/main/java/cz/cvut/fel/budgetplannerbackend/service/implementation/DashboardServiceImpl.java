@@ -3,8 +3,7 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
-import cz.cvut.fel.budgetplannerbackend.exceptions.dashboard.DashboardNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.DashboardMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
@@ -43,7 +42,7 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardDto getUserDashboardById(Long userId, Long id) {
         LOG.info("Getting dashboard with id: {} for user id: {}", id, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new DashboardNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
         return dashboardMapper.toDto(dashboard);
     }
 
@@ -51,7 +50,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Transactional
     public DashboardDto createDashboard(Long userId, DashboardDto dashboardDto) {
         LOG.info("Creating a new dashboard for user id: {}", userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User", userId));
         Dashboard dashboard = dashboardMapper.toEntity(dashboardDto);
         dashboard.setUser(user);
         Dashboard savedDashboard = dashboardRepository.save(dashboard);
@@ -63,7 +62,7 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardDto updateDashboard(Long userId, Long id, DashboardDto dashboardDto) {
         LOG.info("Updating dashboard with id: {} for user id: {}", id, userId);
         Dashboard existingDashboard = dashboardRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new DashboardNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
 
         if (dashboardDto.title() != null) {
             existingDashboard.setTitle(dashboardDto.title());
@@ -82,7 +81,7 @@ public class DashboardServiceImpl implements DashboardService {
     public void deleteDashboard(Long userId, Long id) {
         LOG.info("Deleting dashboard with id: {} for user id: {}", id, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new DashboardNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
         dashboardRepository.delete(dashboard);
     }
 }

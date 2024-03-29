@@ -1,7 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.controller;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
-import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class UserController {
             UserDto userDto = userService.getUserById(id);
             LOG.info("Returned user with id: {}", id);
             return ResponseEntity.ok(userDto);
-        } catch (UserNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error getting user", e);
             return ResponseEntity.notFound().build();
         }
@@ -56,7 +56,7 @@ public class UserController {
             UserDto updatedUserDto = userService.updateUser(id, userDto);
             LOG.info("Updated user with id: {}", id);
             return ResponseEntity.ok(updatedUserDto);
-        } catch (UserNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error updating user", e);
             return ResponseEntity.notFound().build();
         }
@@ -69,7 +69,7 @@ public class UserController {
             userService.deleteUser(id);
             LOG.info("Deleted user with id: {}", id);
             return ResponseEntity.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error deleting user", e);
             return ResponseEntity.notFound().build();
         }

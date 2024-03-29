@@ -1,7 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.service;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
-import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserAlreadyExistsException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityAlreadyExistsException;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface UserService {
 
     UserDto getUserById(Long id);
 
-    UserDto createUser(UserDto userDto) throws UserAlreadyExistsException;
+    UserDto createUser(UserDto userDto) throws EntityAlreadyExistsException;
 
     UserDto updateUser(Long id, UserDto userDto);
 

@@ -5,9 +5,8 @@ import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.Role;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERole;
-import cz.cvut.fel.budgetplannerbackend.exceptions.role.RoleNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserAlreadyExistsException;
-import cz.cvut.fel.budgetplannerbackend.exceptions.user.UserNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityAlreadyExistsException;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.RoleRepository;
@@ -52,19 +51,19 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
         LOG.info("Getting user with id: {}", id);
             User user = userRepository.findById(id)
-                    .orElseThrow(() -> new UserNotFoundException(id));
+                    .orElseThrow(() -> new EntityNotFoundException("User", id));
             LOG.info("Returned user with id: {}", id);
             return userMapper.toDto(user);
     }
     @Override
     @Transactional
-    public UserDto createUser(UserDto userDto) throws UserAlreadyExistsException {
+    public UserDto createUser(UserDto userDto) throws EntityAlreadyExistsException {
         LOG.info("Creating user");
         User user = userMapper.toEntity(userDto);
 
         if (userRepository.findUserByUserName(user.getUserName()).isPresent() || userRepository.findUserByUserEmail(user.getUserEmail()).isPresent()) {
             LOG.warn("User already exists");
-            throw new UserAlreadyExistsException();
+            throw new EntityAlreadyExistsException("User", user.getUserName());
         }
 
         user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
@@ -78,14 +77,14 @@ public class UserServiceImpl implements UserService {
     private void assignRoles(User user, Set<String> strRoles) {
         Set<Role> roles = new HashSet<>();
 
-        if (strRoles == null) {
+        if (strRoles == null || strRoles.isEmpty()) {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(RoleNotFoundException::new);
+                    .orElseThrow(() -> new EntityNotFoundException("Role", ERole.ROLE_USER.name()));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 Role roleEntity = roleRepository.findByName(ERole.valueOf(role.toUpperCase()))
-                        .orElseThrow(RoleNotFoundException::new);
+                        .orElseThrow(() -> new EntityNotFoundException("Role", role.toUpperCase()));
                 roles.add(roleEntity);
             });
         }
@@ -110,7 +109,7 @@ public class UserServiceImpl implements UserService {
             return userMapper.toDto(updatedUser);
         }).orElseThrow(() -> {
             LOG.warn("User with id {} not found", id);
-            return new UserNotFoundException(id);
+            return new EntityNotFoundException("User", id);
         });
     }
 
@@ -129,7 +128,7 @@ public class UserServiceImpl implements UserService {
             LOG.info("Deleted user with id: {}", id);
         } else {
             LOG.warn("User with id {} not found", id);
-            throw new UserNotFoundException(id);
+            throw new EntityNotFoundException("User", id);
         }
     }
 }

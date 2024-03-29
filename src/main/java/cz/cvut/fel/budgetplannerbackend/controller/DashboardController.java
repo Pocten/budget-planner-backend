@@ -2,8 +2,8 @@ package cz.cvut.fel.budgetplannerbackend.controller;
 
 
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
-import cz.cvut.fel.budgetplannerbackend.exceptions.dashboard.DashboardNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
+import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final DashboardService dashboardService;
+    private final DashboardServiceImpl dashboardService;
     private static final Logger LOG = LoggerFactory.getLogger(DashboardController.class);
 
     @PostMapping
@@ -44,7 +44,7 @@ public class DashboardController {
             DashboardDto dashboardDto = dashboardService.getUserDashboardById(userId, dashboardId);
             LOG.info("Returned dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.ok(dashboardDto);
-        } catch (DashboardNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error getting dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
@@ -57,7 +57,7 @@ public class DashboardController {
             DashboardDto updatedDashboard = dashboardService.updateDashboard(userId, dashboardId, dashboardDto);
             LOG.info("Updated dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.ok(updatedDashboard);
-        } catch (DashboardNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error updating dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
@@ -70,7 +70,7 @@ public class DashboardController {
             dashboardService.deleteDashboard(userId, dashboardId);
             LOG.info("Deleted dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.noContent().build();
-        } catch (DashboardNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             LOG.error("Error deleting dashboard with id: {} for user id: {}", dashboardId, userId, e);
             return ResponseEntity.notFound().build();
         }
