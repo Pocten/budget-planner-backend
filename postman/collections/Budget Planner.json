@@ -1,0 +1,1016 @@
+{
+	"info": {
+		"_postman_id": "f7e06225-3e5b-4f3f-86ad-0e0be47b69f3",
+		"name": "Budget Planner",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "19038967-f7e06225-3e5b-4f3f-86ad-0e0be47b69f3"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "99bc12e6-dccf-4fde-9b81-f2c4a9014948",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "785d3f64-35b0-4b44-9214-3a21c8ae624b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userName\": \"Hugod111\",\r\n  \"userEmail\": \"dhugo111@example.com\",\r\n  \"userPassword\": \"new\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"id": "34a305d9-bda8-432f-b928-0d5a90889dd0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\":\"palina\",\r\n    \"userPassword\":\"palina\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f136b523-0b17-462f-9033-fcd59f6c913c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "7e6bfb50-1aa9-44fc-ae3d-523f626c957d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJLdWJhIiwiaWF0IjoxNzExMzAxNjE2LCJleHAiOjE3MTIxNjU2MTZ9.mf6QMXmHbb3w-z5G_mN-QwcwViYkcb1_9xlE2GqRRXvd4Lxl3aqb6QW4bBH9uTyPLG2l2dFxszF0coZhu14zsg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a3509023-cbac-43e3-a416-f1b3ffb1cfde",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "acec2a80-655d-45ee-bf60-6ab24f388ecc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJLdWJhIiwiaWF0IjoxNzExMzAxNjE2LCJleHAiOjE3MTIxNjU2MTZ9.mf6QMXmHbb3w-z5G_mN-QwcwViYkcb1_9xlE2GqRRXvd4Lxl3aqb6QW4bBH9uTyPLG2l2dFxszF0coZhu14zsg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\":\"KubaUpdated\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9f2e60f5-fb41-409c-8544-a1339e22f3f1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "f4dccde4-4205-4454-a4f5-98fd05071a8a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"exampleUser\",\r\n    \"userEmail\": \"exampleUser@email.com\",\r\n    \"userPassword\": \"examplePassword\",\r\n    \"roles\": [\"ROLE_USER\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5706d2c4-c325-49b5-833a-c9bda4383f83",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "086e73b6-f3e8-4605-8447-c20cc4d78d35",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJLdWJhIiwiaWF0IjoxNzExMzAyMTYxLCJleHAiOjE3MTIxNjYxNjF9.XRo9fPqsj8LPko5V3pdbTX-L1BrZClEAj6Zvrcll2Mpg_8qJBZKvjla8Ut2nnX0NmOy3J23Bv9fbyb6GoCQJ7w",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"userName\": \"newKuba\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/8/update",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"8",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user by ID",
+					"id": "2b397681-86b0-4801-830f-a6e83fc8bc02",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJIdWdvIiwiaWF0IjoxNzExMzAxODU5LCJleHAiOjE3MTIxNjU4NTl9.pD5mKw9wIv7mNV-Q61pzV82rB5tvq46qz5fx8W2pvlX4cQ1E6DfS-VyInl_w8gMZmbHzXWfUr7U48SWq8A_-lg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/13",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"13"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "a87c5ec1-4160-4c79-91b9-f654d25889b9"
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get all dashboards of User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "24329fad-5b9f-4515-9a47-d26e9bc6f438",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "b216f706-c055-427c-beb8-16bdb4673cc9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "USER-ID",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/10/dashboards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"10",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's dashboard by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf95dd8a-fe47-44a2-affe-48db70342cfd",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "3f3b2909-7ebb-43c0-8ebe-f3ee4a641183",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "USER-ID",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/10/dashboards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"10",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create dashboard",
+					"id": "f640dba4-8159-439b-8985-541e8316a902",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJLdWJhIiwidXNlcklkIjo4LCJpYXQiOjE3MTEzOTE3NzUsImV4cCI6MTcxMjI1NTc3NX0.XHb_YG5UDAjdXMaJ5J7dZcOzP60YFdzcROGR6fv7eBA_inQy-xWz802Zmkra655y7JTmN4rM10eSlH4POnzyvg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "USER-ID",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"dashboardName\": \"KB\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update dashboard by ID",
+					"id": "9233fa4f-3694-49d0-9906-19d6d869933b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "USER-ID",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/10/dashboards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"10",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete dashboard by ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1709b32d-d481-4d87-9dad-6508bfdb545b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "5da6ead1-0963-4e3e-a452-98565ca6fd8f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "USER-ID",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/10/dashboards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"10",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "d5023d43-afaa-4bfa-ba9f-ff683f62398b"
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Get all categories",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "39819232-9b84-4d6b-af44-02760ce4db35",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "9e95f8ae-cc94-4e92-bb34-3dd9a039b7b0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/2/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"2",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get category by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a5f38037-bbab-482b-92c8-3d914f841e66",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "aeedeba1-a6a3-427f-abbd-54523736bde3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYWxpbmEiLCJ1c2VySWQiOjEwLCJpYXQiOjE3MTE3MjU2MDksImV4cCI6MTcxMjU4OTYwOX0.CgD7Et3qht2QkHimqUkRQQzgzV-AjBs54W1jcI0bW3_7Mc4jvqqjVmWhIi9FhciGC-TvM2o1BPVUVHMydL4C7Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"categories",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "96f6ae54-3767-4812-b5a0-1cbf2c2841ac",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "096398e2-8f63-4622-90b7-16f9a209d223",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYWxpbmEiLCJ1c2VySWQiOjEwLCJpYXQiOjE3MTE3MjU2MDksImV4cCI6MTcxMjU4OTYwOX0.CgD7Et3qht2QkHimqUkRQQzgzV-AjBs54W1jcI0bW3_7Mc4jvqqjVmWhIi9FhciGC-TvM2o1BPVUVHMydL4C7Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Work\",\r\n    \"description\": \"Income from work\",\r\n    \"dashboardId\": 7\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update category by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "213ba6bc-5085-4925-9115-d0f46023b8e5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "048692a9-eec5-49cb-aad8-5f4014532bfb",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"categoryName\": \"Daddy1\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/2/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"2",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete category by ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "11981376-0edc-4fa5-9066-586998eadc67",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "a88f9699-fd34-4f6e-b59d-fd33296d5487",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/2/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"2",
+								"categories",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "1445cb5d-9727-4350-ac14-3b6d4e3d2370"
+		},
+		{
+			"name": "Financial records",
+			"item": [
+				{
+					"name": "Get all financial records",
+					"id": "8d3d9016-c78c-4917-83a8-0874065ed2c9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/financial-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"financial-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get financial record by ID",
+					"id": "01167083-8e0c-4f81-bf18-88e7f948d18a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/financial-records/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"financial-records",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create financial record",
+					"id": "c1ca6dc5-46bc-4f9f-b7aa-bd873ae50131",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYWxpbmEiLCJ1c2VySWQiOjEwLCJpYXQiOjE3MTE3MjU2MDksImV4cCI6MTcxMjU4OTYwOX0.CgD7Et3qht2QkHimqUkRQQzgzV-AjBs54W1jcI0bW3_7Mc4jvqqjVmWhIi9FhciGC-TvM2o1BPVUVHMydL4C7Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 100.00,\r\n    \"description\": \"Kozlovna\",\r\n    \"categoryId\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/financial-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"financial-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update financial record by ID",
+					"id": "00fcdd27-2120-4ae6-a768-4b46eaef8d71",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYWxpbmEiLCJ1c2VySWQiOjEwLCJpYXQiOjE3MTE3MjY5MTksImV4cCI6MTcxMjU5MDkxOX0.q5xtHkRskFt8KtCEL_E0kNf-TciUA3F18LZWvBIMXKPd064ad70zwkmkoKLLtP9oAOVr4C19ihHv5kMy-Z2Lgg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": 100.00,\r\n    \"description\": \"Kozlovna\",\r\n    \"categoryId\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/financial-records/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"financial-records",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete financial record by ID",
+					"id": "fc38cae9-b5d5-455e-bc76-1ee84f8cbb3a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/7/financial-records/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"7",
+								"financial-records",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "afcf1562-65d2-4669-8f3c-4a179b56b0a6"
+		}
+	]
+}
