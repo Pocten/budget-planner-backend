@@ -9,7 +9,7 @@ public record FinancialRecordDto(
         Long id,
         Long dashboardId,
         BigDecimal amount,
-        Long categoryId,
+        Long categoryId, // Can be null
         ERecordType type,
         LocalDateTime date,
         String description

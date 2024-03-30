@@ -55,6 +55,15 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
         FinancialRecord record = financialRecordMapper.toEntity(financialRecordDto);
         record.setDashboard(dashboard);
+        // if category is not set, set it to null
+        if (financialRecordDto.categoryId() != null) {
+            Category category = categoryRepository.findById(financialRecordDto.categoryId())
+                    .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.categoryId()));
+            record.setCategory(category);
+        } else {
+            record.setCategory(null);
+        }
+        // if type is not set, set it to INCOME
         if (record.getType() == null) {
             record.setType(ERecordType.INCOME);
         }
