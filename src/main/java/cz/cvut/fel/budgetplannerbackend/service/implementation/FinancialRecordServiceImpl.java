@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,17 +35,19 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Transactional(readOnly = true)
     public List<FinancialRecordDto> findAllByDashboardId(Long dashboardId) {
         LOG.info("Fetching all financial records for dashboard id: {}", dashboardId);
-        List<FinancialRecord> records = financialRecordRepository.findAllByDashboardId(dashboardId);
-        return records.stream().map(financialRecordMapper::toDto).toList();
+        List<FinancialRecord> financialRecords = financialRecordRepository.findAllByDashboardId(dashboardId);
+        return financialRecords.stream()
+                .map(financialRecordMapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public FinancialRecordDto findByIdAndDashboardId(Long id, Long dashboardId) {
         LOG.info("Fetching financial record with id: {} for dashboard id: {}", id, dashboardId);
-        FinancialRecord record = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
+        FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord", id));
-        return financialRecordMapper.toDto(record);
+        return financialRecordMapper.toDto(financialRecord);
     }
 
     @Override
@@ -53,21 +56,22 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         LOG.info("Creating financial record for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
-        FinancialRecord record = financialRecordMapper.toEntity(financialRecordDto);
-        record.setDashboard(dashboard);
-        // if category is not set, set it to null
-        if (financialRecordDto.categoryId() != null) {
-            Category category = categoryRepository.findById(financialRecordDto.categoryId())
-                    .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.categoryId()));
-            record.setCategory(category);
-        } else {
-            record.setCategory(null);
+
+        Category category = null;
+        if (financialRecordDto.category().id() != null) {
+            category = categoryRepository.findById(financialRecordDto.category().id())
+                    .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.category().id()));
         }
-        // if type is not set, set it to INCOME
-        if (record.getType() == null) {
-            record.setType(ERecordType.INCOME);
-        }
-        FinancialRecord savedRecord = financialRecordRepository.save(record);
+
+        FinancialRecord financialRecord = new FinancialRecord();
+        financialRecord.setDashboard(dashboard);
+        financialRecord.setAmount(financialRecordDto.amount());
+        financialRecord.setCategory(category);
+        financialRecord.setType(financialRecordDto.type() != null ? financialRecordDto.type() : ERecordType.INCOME);
+        financialRecord.setDate(financialRecordDto.date() != null ? financialRecordDto.date() : LocalDateTime.now());
+        financialRecord.setDescription(financialRecordDto.description());
+
+        FinancialRecord savedRecord = financialRecordRepository.save(financialRecord);
         return financialRecordMapper.toDto(savedRecord);
     }
 
@@ -75,28 +79,23 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Transactional
     public FinancialRecordDto update(Long id, Long dashboardId, FinancialRecordDto financialRecordDto) {
         LOG.info("Updating financial record with id: {} for dashboard id: {}", id, dashboardId);
-        FinancialRecord record = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
+        FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord", id));
 
-        if (financialRecordDto.amount() != null) {
-            record.setAmount(financialRecordDto.amount());
-        }
-        if (financialRecordDto.description() != null) {
-            record.setDescription(financialRecordDto.description());
-        }
-        if (financialRecordDto.date() != null) {
-            record.setDate(financialRecordDto.date());
-        }
-        if (financialRecordDto.categoryId() != null) {
-            Category category = categoryRepository.findById(financialRecordDto.categoryId())
-                    .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.categoryId()));
-            record.setCategory(category);
-        }
-        if (financialRecordDto.type() != null) {
-            record.setType(financialRecordDto.type());
+        financialRecord.setAmount(financialRecordDto.amount());
+        financialRecord.setDescription(financialRecordDto.description());
+        financialRecord.setDate(financialRecordDto.date() != null ? financialRecordDto.date() : financialRecord.getDate());
+        financialRecord.setType(financialRecordDto.type() != null ? financialRecordDto.type() : financialRecord.getType());
+
+        if (financialRecordDto.category().id() != null) {
+            Category category = categoryRepository.findById(financialRecordDto.category().id())
+                    .orElseThrow(() -> new EntityNotFoundException("Category", financialRecordDto.category().id()));
+            financialRecord.setCategory(category);
+        } else {
+            financialRecord.setCategory(null);
         }
 
-        FinancialRecord updatedRecord = financialRecordRepository.save(record);
+        FinancialRecord updatedRecord = financialRecordRepository.save(financialRecord);
         LOG.info("Updated financial record with id: {} for dashboard id: {}", id, dashboardId);
         return financialRecordMapper.toDto(updatedRecord);
     }
@@ -104,8 +103,8 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Transactional
     public void delete(Long id, Long dashboardId) {
         LOG.info("Deleting financial record with id: {} for dashboard id: {}", id, dashboardId);
-        FinancialRecord record = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
+        FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord", id));
-        financialRecordRepository.delete(record);
+        financialRecordRepository.delete(financialRecord);
     }
 }

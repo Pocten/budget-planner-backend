@@ -5,18 +5,12 @@ import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = DashboardMapper.class)
 public interface CategoryMapper {
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "name", target = "name")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "dashboard.id", target = "dashboardId")
+    @Mapping(source = "dashboard", target = "dashboard")
     CategoryDto toDto(Category category);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "name", target = "name")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "dashboardId", target = "dashboard.id")
+    @Mapping(target = "dashboard", ignore = true) // Ignore it because you need to install it manually
     Category toEntity(CategoryDto categoryDto);
 }

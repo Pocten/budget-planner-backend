@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 public record FinancialRecordDto(
         Long id,
-        Long dashboardId,
+        DashboardDto dashboard,
         BigDecimal amount,
-        Long categoryId, // Can be null
+        CategoryDto category, // Can be null
         ERecordType type,
         LocalDateTime date,
         String description

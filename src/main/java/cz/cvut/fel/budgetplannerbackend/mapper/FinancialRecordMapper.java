@@ -1,28 +1,38 @@
 package cz.cvut.fel.budgetplannerbackend.mapper;
 
 import cz.cvut.fel.budgetplannerbackend.dto.FinancialRecordDto;
+import cz.cvut.fel.budgetplannerbackend.entity.Category;
+import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {DashboardMapper.class, CategoryMapper.class, UserMapper.class})
 public interface FinancialRecordMapper {
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "dashboard.id", target = "dashboardId")
-    @Mapping(source = "amount", target = "amount")
-    @Mapping(source = "category.id", target = "categoryId")
-    @Mapping(source = "type", target = "type")
-    @Mapping(source = "date", target = "date")
-    @Mapping(source = "description", target = "description")
+    @Mapping(source = "dashboard", target = "dashboard")
+    @Mapping(source = "category", target = "category")
     FinancialRecordDto toDto(FinancialRecord financialRecord);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "dashboardId", target = "dashboard.id")
-    @Mapping(source = "amount", target = "amount")
-    @Mapping(source = "categoryId", target = "category.id")
-    @Mapping(source = "type", target = "type")
-    @Mapping(source = "date", target = "date")
-    @Mapping(source = "description", target = "description")
+    @Mapping(target = "dashboard", source = "dashboard")
+    @Mapping(target = "category", source = "category")
     FinancialRecord toEntity(FinancialRecordDto financialRecordDto);
+
+    default Dashboard dashboardFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Dashboard dashboard = new Dashboard();
+        dashboard.setId(id);
+        return dashboard;
+    }
+
+    default Category categoryFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Category category = new Category();
+        category.setId(id);
+        return category;
+    }
 }
