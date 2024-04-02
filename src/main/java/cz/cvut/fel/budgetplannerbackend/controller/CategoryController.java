@@ -24,7 +24,7 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<CategoryDto>> getAllCategoriesByDashboardId(@PathVariable Long dashboardId) {
         LOG.info("Received request to get all categories for dashboard with id: {}", dashboardId);
-        List<CategoryDto> categoryDtos = categoryService.findAllByDashboardId(dashboardId);
+        List<CategoryDto> categoryDtos = categoryService.findAllCategoriesByDashboardId(dashboardId);
         LOG.info("Returned all categories for dashboard with id: {}", dashboardId);
         return ResponseEntity.ok(categoryDtos);
     }
@@ -33,7 +33,7 @@ public class CategoryController {
     public ResponseEntity<CategoryDto> getCategoryByIdAndDashboardId(@PathVariable Long dashboardId, @PathVariable Long id) {
         LOG.info("Received request to get category with id: {} for dashboard with id: {}", id, dashboardId);
         try {
-            CategoryDto categoryDto = categoryService.findByIdAndDashboardId(id, dashboardId);
+            CategoryDto categoryDto = categoryService.findCategoryByIdAndDashboardId(id, dashboardId);
             LOG.info("Returned category with id: {} for dashboard with id: {}", id, dashboardId);
             return ResponseEntity.ok(categoryDto);
         } catch (EntityNotFoundException e) {
@@ -45,7 +45,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@PathVariable Long dashboardId, @RequestBody CategoryDto categoryDto) {
         LOG.info("Received request to create category for dashboard with id: {}", dashboardId);
-        CategoryDto createdCategoryDto = categoryService.create(dashboardId, categoryDto);
+        CategoryDto createdCategoryDto = categoryService.createCategory(dashboardId, categoryDto);
         LOG.info("Created category for dashboard with id: {}", dashboardId);
         return new ResponseEntity<>(createdCategoryDto, HttpStatus.CREATED);
     }
@@ -54,7 +54,7 @@ public class CategoryController {
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long dashboardId, @PathVariable Long id, @RequestBody CategoryDto categoryDto) {
         LOG.info("Received request to update category with id: {} for dashboard with id: {}", id, dashboardId);
         try {
-            CategoryDto updatedCategoryDto = categoryService.update(dashboardId, id, categoryDto);
+            CategoryDto updatedCategoryDto = categoryService.updateCategory(dashboardId, id, categoryDto);
             LOG.info("Updated category with id: {} for dashboard with id: {}", id, dashboardId);
             return ResponseEntity.ok(updatedCategoryDto);
         } catch (EntityNotFoundException e) {
@@ -67,7 +67,7 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long dashboardId, @PathVariable Long id) {
         LOG.info("Received request to delete category with id: {} for dashboard with id: {}", id, dashboardId);
         try {
-            categoryService.delete(dashboardId, id);
+            categoryService.deleteCategory(dashboardId, id);
             LOG.info("Deleted category with id: {} for dashboard with id: {}", id, dashboardId);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {

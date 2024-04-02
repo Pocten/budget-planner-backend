@@ -32,7 +32,7 @@ public class DashboardController {
     @GetMapping
     public ResponseEntity<List<DashboardDto>> getAllDashboardsByUserId(@PathVariable Long userId) {
         LOG.info("Received request to get all dashboards for user id: {}", userId);
-        List<DashboardDto> dashboards = dashboardService.getAllDashboardsByUserId(userId);
+        List<DashboardDto> dashboards = dashboardService.findAllDashboardsByUserId(userId);
         LOG.info("Returned all dashboards for user id: {}", userId);
         return ResponseEntity.ok(dashboards);
     }
@@ -41,7 +41,7 @@ public class DashboardController {
     public ResponseEntity<DashboardDto> getUserDashboardById(@PathVariable Long userId, @PathVariable Long dashboardId) {
         LOG.info("Received request to get dashboard with id: {} for user id: {}", dashboardId, userId);
         try {
-            DashboardDto dashboardDto = dashboardService.getUserDashboardById(userId, dashboardId);
+            DashboardDto dashboardDto = dashboardService.findUserDashboardById(userId, dashboardId);
             LOG.info("Returned dashboard with id: {} for user id: {}", dashboardId, userId);
             return ResponseEntity.ok(dashboardDto);
         } catch (EntityNotFoundException e) {

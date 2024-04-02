@@ -29,7 +29,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DashboardDto> getAllDashboardsByUserId(Long userId) {
+    public List<DashboardDto> findAllDashboardsByUserId(Long userId) {
         LOG.info("Getting all dashboards for user id: {}", userId);
         List<Dashboard> dashboards = dashboardRepository.findAllByUserId(userId);
         return dashboards.stream()
@@ -39,7 +39,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public DashboardDto getUserDashboardById(Long userId, Long id) {
+    public DashboardDto findUserDashboardById(Long userId, Long id) {
         LOG.info("Getting dashboard with id: {} for user id: {}", id, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));

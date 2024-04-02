@@ -5,9 +5,9 @@ import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
 import java.util.List;
 
 public interface DashboardService {
-    List<DashboardDto> getAllDashboardsByUserId(Long userId);
+    List<DashboardDto> findAllDashboardsByUserId(Long userId);
 
-    DashboardDto getUserDashboardById(Long userId, Long id);
+    DashboardDto findUserDashboardById(Long userId, Long id);
 
     DashboardDto createDashboard(Long userId, DashboardDto dashboardDto);
 

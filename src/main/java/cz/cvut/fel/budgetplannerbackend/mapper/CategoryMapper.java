@@ -11,6 +11,6 @@ public interface CategoryMapper {
     @Mapping(source = "dashboard", target = "dashboard")
     CategoryDto toDto(Category category);
 
-    @Mapping(target = "dashboard", ignore = true) // Ignore it because you need to install it manually
+    @Mapping(target = "dashboard", ignore = true) // I'll set it manually in the service layer
     Category toEntity(CategoryDto categoryDto);
 }

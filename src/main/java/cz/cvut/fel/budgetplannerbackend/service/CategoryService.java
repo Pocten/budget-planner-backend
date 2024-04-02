@@ -5,13 +5,14 @@ import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryDto> findAllByDashboardId(Long dashboardId);
+    List<CategoryDto> findAllCategoriesByDashboardId(Long dashboardId);
 
-    CategoryDto findByIdAndDashboardId(Long id, Long dashboardId);
+    CategoryDto findCategoryByIdAndDashboardId(Long id, Long dashboardId);
 
-    CategoryDto create(Long dashboardId, CategoryDto categoryDto);
+    CategoryDto createCategory(Long dashboardId, CategoryDto categoryDto);
 
-    CategoryDto update(Long dashboardId, Long id, CategoryDto categoryDto);
+    CategoryDto updateCategory(Long dashboardId, Long id, CategoryDto categoryDto);
 
-    void delete(Long dashboardId, Long id);
+    void deleteCategory(Long dashboardId, Long id);
 }
+

@@ -28,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryDto> findAllByDashboardId(Long dashboardId) {
+    public List<CategoryDto> findAllCategoriesByDashboardId(Long dashboardId) {
         LOG.info("Fetching all categories for dashboard id: {}", dashboardId);
         List<Category> categories = categoryRepository.findAllByDashboardId(dashboardId);
         return categories.stream()
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public CategoryDto findByIdAndDashboardId(Long id, Long dashboardId) {
+    public CategoryDto findCategoryByIdAndDashboardId(Long id, Long dashboardId) {
         LOG.info("Fetching category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto create(Long dashboardId, CategoryDto categoryDto) {
+    public CategoryDto createCategory(Long dashboardId, CategoryDto categoryDto) {
         LOG.info("Creating new category for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto update(Long dashboardId, Long id, CategoryDto categoryDto) {
+    public CategoryDto updateCategory(Long dashboardId, Long id, CategoryDto categoryDto) {
         LOG.info("Updating category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
@@ -78,7 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void delete(Long dashboardId, Long id) {
+    public void deleteCategory(Long dashboardId, Long id) {
         LOG.info("Deleting category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));

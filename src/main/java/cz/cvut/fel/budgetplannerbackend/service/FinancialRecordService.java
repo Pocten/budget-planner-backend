@@ -5,13 +5,14 @@ import cz.cvut.fel.budgetplannerbackend.dto.FinancialRecordDto;
 import java.util.List;
 
 public interface FinancialRecordService {
-    List<FinancialRecordDto> findAllByDashboardId(Long dashboardId);
+    List<FinancialRecordDto> findAllFinancialRecordsByDashboardId(Long dashboardId);
 
-    FinancialRecordDto findByIdAndDashboardId(Long id, Long dashboardId);
+    FinancialRecordDto findFinancialRecordByIdAndDashboardId(Long id, Long dashboardId);
 
-    FinancialRecordDto create(Long dashboardId, FinancialRecordDto financialRecordDto);
+    FinancialRecordDto createFinancialRecord(Long dashboardId, FinancialRecordDto financialRecordDto);
 
-    FinancialRecordDto update(Long id, Long dashboardId, FinancialRecordDto financialRecordDto);
+    FinancialRecordDto updateFinancialRecord(Long dashboardId, Long id, FinancialRecordDto financialRecordDto);
 
-    void delete(Long id, Long dashboardId);
+    void deleteFinancialRecord(Long dashboardId, Long id);
 }
+

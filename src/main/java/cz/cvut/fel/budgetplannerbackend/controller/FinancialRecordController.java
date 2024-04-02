@@ -22,7 +22,7 @@ public class FinancialRecordController {
     @GetMapping
     public ResponseEntity<List<FinancialRecordDto>> getAllFinancialRecordsByDashboardId(@PathVariable Long dashboardId) {
         LOG.info("Received request to list all financial records for dashboard id: {}", dashboardId);
-        List<FinancialRecordDto> records = financialRecordService.findAllByDashboardId(dashboardId);
+        List<FinancialRecordDto> records = financialRecordService.findAllFinancialRecordsByDashboardId(dashboardId);
         LOG.info("Returned all financial records for dashboard id: {}", dashboardId);
         return ResponseEntity.ok(records);
     }
@@ -30,7 +30,7 @@ public class FinancialRecordController {
     @GetMapping("/{id}")
     public ResponseEntity<FinancialRecordDto> getFinancialRecordByIdAndDashboardId(@PathVariable Long dashboardId, @PathVariable Long id) {
         LOG.info("Received request to fetch financial record with id: {} for dashboard id: {}", id, dashboardId);
-        FinancialRecordDto recordDto = financialRecordService.findByIdAndDashboardId(id, dashboardId);
+        FinancialRecordDto recordDto = financialRecordService.findFinancialRecordByIdAndDashboardId(id, dashboardId);
         LOG.info("Returned financial record with id: {} for dashboard id: {}", id, dashboardId);
         return ResponseEntity.ok(recordDto);
     }
@@ -38,7 +38,7 @@ public class FinancialRecordController {
     @PostMapping
     public ResponseEntity<FinancialRecordDto> createFinancialRecord(@PathVariable Long dashboardId, @RequestBody FinancialRecordDto financialRecordDto) {
         LOG.info("Received request to create a new financial record for dashboard id: {}", dashboardId);
-        FinancialRecordDto createdRecord = financialRecordService.create(dashboardId, financialRecordDto);
+        FinancialRecordDto createdRecord = financialRecordService.createFinancialRecord(dashboardId, financialRecordDto);
         LOG.info("Created new financial record with id: {} for dashboard id: {}", createdRecord.id(), dashboardId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord);
     }
@@ -46,7 +46,7 @@ public class FinancialRecordController {
     @PutMapping("/{id}")
     public ResponseEntity<FinancialRecordDto> updateFinancialRecord(@PathVariable Long dashboardId, @PathVariable Long id, @RequestBody FinancialRecordDto financialRecordDto) {
         LOG.info("Received request to update financial record with id: {} for dashboard id: {}", id, dashboardId);
-        FinancialRecordDto updatedRecord = financialRecordService.update(id, dashboardId, financialRecordDto);
+        FinancialRecordDto updatedRecord = financialRecordService.updateFinancialRecord(id, dashboardId, financialRecordDto);
         LOG.info("Updated financial record with id: {} for dashboard id: {}", id, dashboardId);
         return ResponseEntity.ok(updatedRecord);
     }
@@ -54,7 +54,7 @@ public class FinancialRecordController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFinancialRecord(@PathVariable Long dashboardId, @PathVariable Long id) {
         LOG.info("Received request to delete financial record with id: {} for dashboard id: {}", id, dashboardId);
-        financialRecordService.delete(id, dashboardId);
+        financialRecordService.deleteFinancialRecord(id, dashboardId);
         LOG.info("Deleted financial record with id: {} for dashboard id: {}", id, dashboardId);
         return ResponseEntity.noContent().build();
     }

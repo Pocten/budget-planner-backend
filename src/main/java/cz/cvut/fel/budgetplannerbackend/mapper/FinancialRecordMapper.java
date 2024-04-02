@@ -7,15 +7,17 @@ import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {DashboardMapper.class, CategoryMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {DashboardMapper.class, CategoryMapper.class, UserMapper.class, TagMapper.class, UserMapper.class})
 public interface FinancialRecordMapper {
 
     @Mapping(source = "dashboard", target = "dashboard")
     @Mapping(source = "category", target = "category")
+    @Mapping(source = "tags", target = "tags")
     FinancialRecordDto toDto(FinancialRecord financialRecord);
 
     @Mapping(target = "dashboard", source = "dashboard")
     @Mapping(target = "category", source = "category")
+    @Mapping(target = "tags", ignore = true) // Игнорируем теги при создании сущности из DTO
     FinancialRecord toEntity(FinancialRecordDto financialRecordDto);
 
     default Dashboard dashboardFromId(Long id) {
