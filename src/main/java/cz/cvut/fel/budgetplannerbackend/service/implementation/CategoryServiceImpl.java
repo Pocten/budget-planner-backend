@@ -3,10 +3,12 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
+import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
 import cz.cvut.fel.budgetplannerbackend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final FinancialRecordRepository financialRecordRepository;
     private final DashboardRepository dashboardRepository;
     private final CategoryMapper categoryMapper;
     private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
@@ -80,6 +83,22 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long dashboardId, Long id) {
         LOG.info("Deleting category with id: {} for dashboard id: {}", id, dashboardId);
+
+        List<FinancialRecord> recordsWithCategory = financialRecordRepository.findByCategoryIdAndDashboardId(id, dashboardId);
+        for (FinancialRecord financialRecord : recordsWithCategory) {
+            financialRecord.setCategory(null);
+            financialRecordRepository.save(financialRecord);
+        }
+
+
+//        public void deleteCategory(Long dashboardId, Long id) {
+//            LOG.info("Deleting category with id: {} for dashboard id: {}", id, dashboardId);
+//            Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
+//                    .orElseThrow(() -> new EntityNotFoundException("Category", id));
+//            categoryRepository.delete(category);
+//        }
+
+
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
         categoryRepository.delete(category);

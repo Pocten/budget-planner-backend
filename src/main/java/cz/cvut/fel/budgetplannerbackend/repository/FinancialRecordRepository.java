@@ -13,4 +13,7 @@ public interface FinancialRecordRepository extends JpaRepository<FinancialRecord
     List<FinancialRecord> findAllByDashboardId(Long dashboardId);
 
     Optional<FinancialRecord> findByIdAndDashboardId(Long id, Long dashboardId);
+
+    List<FinancialRecord> findByCategoryIdAndDashboardId(Long categoryId, Long dashboardId);
+
 }
