@@ -48,7 +48,7 @@ public class FinancialRecord {
     @Column(name = "description", length = 500)
     private String description;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "financial_record_tag",
             joinColumns = @JoinColumn(name = "financial_record_id"),

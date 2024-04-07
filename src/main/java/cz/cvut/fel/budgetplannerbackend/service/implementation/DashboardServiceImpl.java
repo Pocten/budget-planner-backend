@@ -5,8 +5,7 @@ import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.DashboardMapper;
-import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
-import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.*;
 import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,6 +20,10 @@ import java.util.List;
 public class DashboardServiceImpl implements DashboardService {
 
     private final DashboardRepository dashboardRepository;
+    private final BudgetRepository budgetRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
+    private final FinancialRecordRepository financialRecordRepository;
     private final DashboardMapper dashboardMapper;
     private final UserRepository userRepository;
 
@@ -79,9 +82,17 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void deleteDashboard(Long userId, Long id) {
-        LOG.info("Deleting dashboard with id: {} for user id: {}", id, userId);
+        LOG.info("Initiating deletion of dashboard with id: {} for user id: {}", id, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
+
+        LOG.info("Deleting all budgets, categories, tags, and financial records associated with dashboard id: {}", id);
+        budgetRepository.deleteByDashboardId(dashboard.getId());
+        categoryRepository.deleteByDashboardId(dashboard.getId());
+        tagRepository.deleteByDashboardId(dashboard.getId());
+        financialRecordRepository.deleteByDashboardId(dashboard.getId());
+
+        LOG.info("Dashboard with id: {} successfully deleted, along with all its associated data.", id);
         dashboardRepository.delete(dashboard);
     }
 }

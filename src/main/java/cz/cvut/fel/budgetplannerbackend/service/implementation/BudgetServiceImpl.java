@@ -7,6 +7,7 @@ import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.BudgetMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.BudgetRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.FinancialGoalRepository;
 import cz.cvut.fel.budgetplannerbackend.service.BudgetService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class BudgetServiceImpl implements BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final DashboardRepository dashboardRepository;
+    private final FinancialGoalRepository financialGoalRepository;
     private final BudgetMapper budgetMapper;
     private static final Logger LOG = LoggerFactory.getLogger(BudgetServiceImpl.class);
 
@@ -77,9 +79,14 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public void deleteBudget(Long dashboardId, Long id) {
-        LOG.info("Deleting budget with id: {} for dashboard id: {}", id, dashboardId);
+        LOG.info("Initiating deletion of budget with id: {} for dashboard id: {}", id, dashboardId);
         Budget budget = budgetRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + id + " for dashboard id: " + dashboardId));
+
+        LOG.info("Deleting all financial goals associated with budget id: {}", id);
+        financialGoalRepository.deleteByBudgetId(budget.getId());
+
+        LOG.info("Budget with id: {} successfully deleted, along with all its associated financial goals.", id);
         budgetRepository.delete(budget);
     }
 }

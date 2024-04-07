@@ -7,6 +7,7 @@ import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
 import cz.cvut.fel.budgetplannerbackend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final DashboardRepository dashboardRepository;
+    private final FinancialRecordRepository financialRecordRepository;
     private final CategoryMapper categoryMapper;
     private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
@@ -79,9 +81,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long dashboardId, Long id) {
-        LOG.info("Deleting category with id: {} for dashboard id: {}", id, dashboardId);
+        LOG.info("Initiating deletion of category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
+
+        LOG.info("Setting category_id to null for all financial records associated with category id: {}", id);
+        financialRecordRepository.setCategoryToNullByCategoryId(category.getId());
+
+        LOG.info("Category with id: {} successfully deleted, and all associated financial records are updated.", id);
         categoryRepository.delete(category);
     }
 }

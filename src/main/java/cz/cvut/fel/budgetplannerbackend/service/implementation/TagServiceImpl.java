@@ -2,10 +2,12 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.TagDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
+import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
 import cz.cvut.fel.budgetplannerbackend.entity.Tag;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.TagMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.TagRepository;
 import cz.cvut.fel.budgetplannerbackend.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final DashboardRepository dashboardRepository;
+    private final FinancialRecordRepository financialRecordRepository;
     private final TagMapper tagMapper;
     private static final Logger LOG = LoggerFactory.getLogger(TagServiceImpl.class);
 
@@ -78,9 +81,18 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public void deleteTag(Long dashboardId, Long id) {
-        LOG.info("Deleting tag with id: {} for dashboard id: {}", id, dashboardId);
+        LOG.info("Initiating deletion of tag with id: {} for dashboard id: {}", id, dashboardId);
         Tag tag = tagRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Tag not found with id: " + id + " for dashboard id: " + dashboardId));
+
+        LOG.info("Removing tag with id: {} from all associated financial records.", id);
+        List<FinancialRecord> financialRecords = financialRecordRepository.findAllWithTag(tag);
+        financialRecords.forEach(financialRecord -> {
+            financialRecord.getTags().remove(tag);
+            financialRecordRepository.save(financialRecord);
+        });
+
+        LOG.info("Tag with id: {} successfully deleted, and removed from all associated financial records.", id);
         tagRepository.delete(tag);
     }
 }
