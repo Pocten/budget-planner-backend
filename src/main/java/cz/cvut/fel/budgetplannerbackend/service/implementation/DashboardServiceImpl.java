@@ -24,8 +24,9 @@ public class DashboardServiceImpl implements DashboardService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final FinancialRecordRepository financialRecordRepository;
-    private final DashboardMapper dashboardMapper;
+    private final FinancialGoalRepository financialGoalRepository;
     private final UserRepository userRepository;
+    private final DashboardMapper dashboardMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
@@ -86,11 +87,18 @@ public class DashboardServiceImpl implements DashboardService {
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
 
-        LOG.info("Deleting all budgets, categories, tags, and financial records associated with dashboard id: {}", id);
-        budgetRepository.deleteByDashboardId(dashboard.getId());
-        categoryRepository.deleteByDashboardId(dashboard.getId());
-        tagRepository.deleteByDashboardId(dashboard.getId());
-        financialRecordRepository.deleteByDashboardId(dashboard.getId());
+        LOG.info("Removing associations between financial records and tags for dashboard id: {}", id);
+        financialRecordRepository.findAllByDashboardId(id).forEach(financialRecord -> {
+            financialRecord.getTags().clear();
+            financialRecordRepository.save(financialRecord);
+        });
+
+        LOG.info("Deleting all financial goals, budgets, categories, tags, and financial records associated with dashboard id: {}", id);
+        // TODO delete financial goals
+        budgetRepository.deleteByDashboardId(id);
+        categoryRepository.deleteByDashboardId(id);
+        financialRecordRepository.deleteByDashboardId(id);
+        tagRepository.deleteByDashboardId(id);
 
         LOG.info("Dashboard with id: {} successfully deleted, along with all its associated data.", id);
         dashboardRepository.delete(dashboard);

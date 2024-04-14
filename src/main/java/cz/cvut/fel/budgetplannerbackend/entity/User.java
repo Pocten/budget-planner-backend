@@ -1,6 +1,8 @@
 package cz.cvut.fel.budgetplannerbackend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,13 +26,17 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_name", unique = true)
+    @Column(name = "user_name", unique = true, nullable = false)
+    @NotBlank(message = "User name is required")
     private String userName;
 
-    @Column(name = "user_email", unique = true)
+    @Column(name = "user_email", unique = true, nullable = false)
+    @Email(message = "Valid email is required")
+    @NotBlank(message = "Email is required")
     private String userEmail;
 
-    @Column(name = "user_password")
+    @Column(name = "user_password", nullable = false)
+    @NotBlank(message = "Password is required")
     private String userPassword;
 
     @CreationTimestamp

@@ -3,7 +3,6 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
-import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
