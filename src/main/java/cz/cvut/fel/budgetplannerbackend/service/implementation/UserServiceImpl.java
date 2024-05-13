@@ -55,6 +55,7 @@ public class UserServiceImpl implements UserService {
             LOG.info("Returned user with id: {}", id);
             return userMapper.toDto(user);
     }
+
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) throws EntityAlreadyExistsException {
@@ -67,29 +68,10 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
-        assignRoles(user, userDto.roles());
 
         User savedUser = userRepository.save(user);
         LOG.info("Created user");
         return userMapper.toDto(savedUser);
-    }
-
-    private void assignRoles(User user, Set<String> strRoles) {
-        Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null || strRoles.isEmpty()) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new EntityNotFoundException("Role", ERole.ROLE_USER.name()));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                Role roleEntity = roleRepository.findByName(ERole.valueOf(role.toUpperCase()))
-                        .orElseThrow(() -> new EntityNotFoundException("Role", role.toUpperCase()));
-                roles.add(roleEntity);
-            });
-        }
-
-        user.setRoles(roles);
     }
 
     @Override

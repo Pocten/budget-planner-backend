@@ -27,6 +27,10 @@ public class FinancialRecord {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dashboard_id", nullable = false)
     private Dashboard dashboard;
 
@@ -57,4 +61,3 @@ public class FinancialRecord {
     private Set<Tag> tags = new HashSet<>();
 
 }
-

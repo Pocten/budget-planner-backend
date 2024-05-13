@@ -1,14 +1,17 @@
 package cz.cvut.fel.budgetplannerbackend.controller;
 
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
+import cz.cvut.fel.budgetplannerbackend.dto.CategoryPriorityDto;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
-import cz.cvut.fel.budgetplannerbackend.service.CategoryService;
+import cz.cvut.fel.budgetplannerbackend.security.model.CustomUserDetails;
+import cz.cvut.fel.budgetplannerbackend.service.implementation.CategoryPriorityServiceImpl;
 import cz.cvut.fel.budgetplannerbackend.service.implementation.CategoryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryServiceImpl categoryService;
+    private final CategoryPriorityServiceImpl categoryPriorityService;
     private static final Logger LOG = LoggerFactory.getLogger(CategoryController.class);
 
     @GetMapping
@@ -75,4 +79,48 @@ public class CategoryController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/{categoryId}/priorities")
+    public ResponseEntity<CategoryPriorityDto> setCategoryPriority(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId,
+            @RequestParam Integer priority,
+            Authentication authentication) {
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            LOG.info("Received request to set priority for userId: {}, categoryId: {}, dashboardId: {}, priority: {}",
+                    userDetails.getUserId(), categoryId, dashboardId, priority);
+            CategoryPriorityDto categoryPriorityDto = new CategoryPriorityDto(
+                    null,
+                    userDetails.getUserId(),
+                    categoryId,
+                    dashboardId,
+                    priority
+            );
+            CategoryPriorityDto createdPriority = categoryPriorityService.setCategoryPriority(categoryPriorityDto);
+            LOG.info("Priority set successfully for userId: {}, categoryId: {}, dashboardId: {}", userDetails.getUserId(), categoryId, dashboardId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdPriority);
+        }
+        LOG.warn("User authentication required to set priority");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    }
+
+    @GetMapping("/{categoryId}/priorities/calculate")
+    public ResponseEntity<Double> calculateCategoryPriority(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId) {
+        LOG.info("Received request to calculate priority for categoryId: {} on dashboardId: {}", categoryId, dashboardId);
+        double priority = categoryPriorityService.calculateCategoryPriority(categoryId, dashboardId);
+        LOG.info("Calculated priority for categoryId: {} on dashboardId: {} is {}", categoryId, dashboardId, priority);
+        return ResponseEntity.ok(priority);
+    }
+
+    @GetMapping("/priorities")
+    public ResponseEntity<List<CategoryPriorityDto>> getCategoryPriorities(@PathVariable Long dashboardId) {
+        LOG.info("Received request to get all priorities for dashboardId: {}", dashboardId);
+        List<CategoryPriorityDto> priorities = categoryPriorityService.getCategoryPriorities(dashboardId);
+        LOG.info("Returned {} priorities for dashboardId: {}", priorities.size(), dashboardId);
+        return ResponseEntity.ok(priorities);
+    }
 }
+

@@ -8,6 +8,7 @@ import java.util.Set;
 
 public record FinancialRecordDto(
         Long id,
+        Long userId,
         DashboardDto dashboard,
         BigDecimal amount,
         CategoryDto category, // Can be null

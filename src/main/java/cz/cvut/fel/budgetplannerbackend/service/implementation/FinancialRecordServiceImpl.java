@@ -1,11 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.FinancialRecordDto;
-import cz.cvut.fel.budgetplannerbackend.dto.TagDto;
-import cz.cvut.fel.budgetplannerbackend.entity.Category;
-import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
-import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
-import cz.cvut.fel.budgetplannerbackend.entity.Tag;
+import cz.cvut.fel.budgetplannerbackend.entity.*;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERecordType;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.FinancialRecordMapper;
@@ -13,6 +9,7 @@ import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.TagRepository;
+import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.FinancialRecordService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,6 +32,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     private final FinancialRecordMapper financialRecordMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final SecurityUtils securityUtils;
 
     private static final Logger LOG = LoggerFactory.getLogger(FinancialRecordServiceImpl.class);
 
@@ -70,8 +68,12 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
                     .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + financialRecordDto.category().id()));
         }
 
+        User currentUser = securityUtils.getCurrentUser();
+        LOG.info("Current user id: {}", currentUser.getId());
+
         FinancialRecord financialRecord = new FinancialRecord();
         financialRecord.setDashboard(dashboard);
+        financialRecord.setUser(currentUser); // Set the current user
         financialRecord.setAmount(financialRecordDto.amount());
         financialRecord.setCategory(category);
         financialRecord.setType(financialRecordDto.type() != null ? financialRecordDto.type() : ERecordType.INCOME);
@@ -89,6 +91,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         }
 
         FinancialRecord savedRecord = financialRecordRepository.save(financialRecord);
+        LOG.info("Created new financial record with id: {} for dashboard id: {}", savedRecord.getId(), dashboardId);
         return financialRecordMapper.toDto(savedRecord);
     }
 
@@ -135,3 +138,4 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         financialRecordRepository.delete(financialRecord);
     }
 }
+

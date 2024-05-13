@@ -59,8 +59,7 @@ public class AuthenticationService {
                 registrationRequest.getUserName(),
                 registrationRequest.getUserEmail(),
                 registrationRequest.getUserPassword(),
-                LocalDateTime.now(),
-                null);
+                LocalDateTime.now());
         UserDto createdUserDto;
         try {
             createdUserDto = userService.createUser(userDto);

@@ -9,6 +9,5 @@ public record UserDto(
         String userName,
         String userEmail,
         String userPassword,
-        LocalDateTime userDateRegistration,
-        Set<String>roles
+        LocalDateTime userDateRegistration
 ) { }

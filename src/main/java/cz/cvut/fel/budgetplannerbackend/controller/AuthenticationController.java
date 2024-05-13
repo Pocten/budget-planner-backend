@@ -47,7 +47,7 @@ public class AuthenticationController {
             return ResponseEntity.ok(registered);
         } catch (EntityAlreadyExistsException e) {
             LOG.error("Registration failed for user: {}", registrationRequest.getUserName(), e);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // Use CONFLICT status when duplication occurs
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             LOG.error("Registration error for user: {}", registrationRequest.getUserName(), e);
             return ResponseEntity.badRequest().build(); // or another appropriate status based on the error
