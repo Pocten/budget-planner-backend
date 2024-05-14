@@ -21,5 +21,8 @@ public interface InviteLinkRepository extends JpaRepository<InviteLink, Long> {
 
     @Query("SELECT l FROM InviteLink l WHERE l.link = :link AND l.active = true")
     Optional<InviteLink> findByLinkAndIsActiveTrue(String link);
+
+    @Query("SELECT i FROM InviteLink i WHERE i.dashboard.id = :dashboardId AND i.active = true")
+    Optional<InviteLink> findByDashboardIdAndIsActiveTrue(Long dashboardId);
 }
 

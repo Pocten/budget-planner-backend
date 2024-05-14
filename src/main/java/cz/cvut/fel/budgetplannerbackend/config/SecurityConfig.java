@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow access to Swagger UI first
                         .requestMatchers("/", "/home", "/registration", "/api/auth/**").permitAll()
+                        .requestMatchers("/api/v1/dashboards/*/invite-links/use/**").permitAll() // Allow access to use links
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class)

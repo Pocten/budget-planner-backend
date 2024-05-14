@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,20 +37,22 @@ public class InviteLinkServiceImpl implements InviteLinkService {
     @Override
     @Transactional
     public InviteLinkDto createInviteLink(InviteLinkDto inviteLinkDto) {
-        LOG.debug("Attempting to create an invite link for dashboard ID: {}", inviteLinkDto.dashboardId());
-        Dashboard dashboard = dashboardRepository.findById(inviteLinkDto.dashboardId())
-                .orElseThrow(() -> new EntityNotFoundException("Dashboard not found with id: " + inviteLinkDto.dashboardId()));
+        // Checking if there is already an active link for this dashboard
+        Optional<InviteLink> existingLink = inviteLinkRepository.findByDashboardIdAndIsActiveTrue(inviteLinkDto.dashboardId());
+        // Removing an existing link
+        existingLink.ifPresent(inviteLinkRepository::delete);
 
-        InviteLink inviteLink = new InviteLink();
-        inviteLink.setDashboard(dashboard);
-        inviteLink.setLink(UUID.randomUUID().toString());
-        inviteLink.setExpiryDate(LocalDateTime.now().plusDays(30));
-        inviteLink.setActive(true);
+        // Create a new link
+        InviteLink newLink = new InviteLink();
+        newLink.setLink(UUID.randomUUID().toString()); // Generating a unique link
+        newLink.setDashboard(dashboardRepository.findById(inviteLinkDto.dashboardId()).orElseThrow());
+        newLink.setExpiryDate(LocalDateTime.now().plusDays(30));
+        newLink.setActive(true);
+        inviteLinkRepository.save(newLink);
 
-        inviteLink = inviteLinkRepository.save(inviteLink);
-        LOG.info("Created invite link: {} for dashboard ID: {}", inviteLink.getLink(), inviteLink.getDashboard().getId());
-        return inviteLinkMapper.toDto(inviteLink);
+        return inviteLinkMapper.toDto(newLink);
     }
+
 
     @Override
     @Scheduled(fixedRate = 86400000) // 86400000 milliseconds = 24 hours
