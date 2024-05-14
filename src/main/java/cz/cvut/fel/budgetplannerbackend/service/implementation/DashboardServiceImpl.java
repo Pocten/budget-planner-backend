@@ -82,10 +82,12 @@ public class DashboardServiceImpl implements DashboardService {
         User currentUser = securityUtils.getCurrentUser();
         LOG.info("Fetching accessible dashboards for user id: {}", currentUser.getId());
 
-        // We get the IDs of all dashboards to which the user has access
+        // Get the IDs of all dashboards to which the user has access and which he did not create
         List<Long> accessibleDashboardIds = dashboardAccessRepository.findAllByUserId(currentUser.getId())
                 .stream()
+                .filter(access -> !access.getDashboard().getUser().getId().equals(currentUser.getId())) // Exclude dashboards where the user is the creator
                 .map(access -> access.getDashboard().getId())
+                .distinct() // Remove possible duplicates
                 .toList();
 
         if (accessibleDashboardIds.isEmpty()) {
@@ -93,15 +95,16 @@ public class DashboardServiceImpl implements DashboardService {
             return List.of();
         }
 
-        // Retrieving dashboards based on the received IDs
+        // Get dashboards based on the found IDs
         List<Dashboard> accessibleDashboards = dashboardRepository.findAllById(accessibleDashboardIds);
         LOG.info("Found {} accessible dashboards for user id: {}", accessibleDashboards.size(), currentUser.getId());
 
-        // Converting dashboards to DTOs
+        // Convert dashboards to DTO
         return accessibleDashboards.stream()
                 .map(dashboardMapper::toDto)
                 .toList();
     }
+
 
     @Override
     @Transactional
@@ -147,16 +150,24 @@ public class DashboardServiceImpl implements DashboardService {
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
 
-        LOG.info("Deleting all financial goals, budgets, categories, tags, and financial records associated with dashboard id: {}", dashboardId);
-        dashboardAccessRepository.deleteByDashboardId(dashboardId);
-        dashboardRoleRepository.deleteByDashboardId(dashboardId);
+        // Удаление или обновление financial records, которые могут ссылаются на categories или budgets
+        LOG.info("Deleting financial records associated with dashboard id: {}", dashboardId);
+        financialRecordRepository.deleteByDashboardId(dashboardId);
+
+        // Удаление связанных данных, после удаления financial records
+        LOG.info("Deleting financial goals, budgets and categories associated with dashboard id: {}", dashboardId);
         financialGoalRepository.deleteByDashboardId(dashboardId);
         budgetRepository.deleteByDashboardId(dashboardId);
         categoryRepository.deleteByDashboardId(dashboardId);
-        financialRecordRepository.deleteByDashboardId(dashboardId);
 
-        LOG.info("Dashboard with id: {} successfully deleted, along with all its associated data.", dashboardId);
+        // Удаление dashboard accesses и roles
+        LOG.info("Deleting access and roles associated with dashboard id: {}", dashboardId);
+        dashboardAccessRepository.deleteByDashboardId(dashboardId);
+        dashboardRoleRepository.deleteByDashboardId(dashboardId);
+
+        // Удаление самого dashboard
         dashboardRepository.delete(dashboard);
+        LOG.info("Dashboard with id: {} successfully deleted, along with all its associated data.", dashboardId);
     }
 
 
