@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/dashboards/{dashboardId}/budgets/{budgetId}/financial-goals")
+@RequestMapping("/api/v1/dashboards/{dashboardId}/financial-goals")
 @RequiredArgsConstructor
 public class FinancialGoalController {
 
@@ -21,19 +21,19 @@ public class FinancialGoalController {
     private static final Logger LOG = LoggerFactory.getLogger(FinancialGoalController.class);
 
     @GetMapping
-    public ResponseEntity<List<FinancialGoalDto>> getAllFinancialGoalsByBudgetId(@PathVariable Long dashboardId, @PathVariable Long budgetId) {
-        LOG.info("Received request to get all financial goals for dashboard with id: {} and budget id: {}", dashboardId, budgetId);
-        List<FinancialGoalDto> financialGoalDtos = financialGoalService.findAllFinancialGoalsByBudgetId(dashboardId, budgetId);
-        LOG.info("Returned all financial goals for dashboard with id: {} and budget id: {}", dashboardId, budgetId);
+    public ResponseEntity<List<FinancialGoalDto>> getAllFinancialGoalsByDashboardId(@PathVariable Long dashboardId) {
+        LOG.info("Received request to get all financial goals for dashboard with id: {}", dashboardId);
+        List<FinancialGoalDto> financialGoalDtos = financialGoalService.findAllFinancialGoalsByDashboardId(dashboardId);
+        LOG.info("Returned all financial goals for dashboard with id: {}", dashboardId);
         return ResponseEntity.ok(financialGoalDtos);
     }
 
     @GetMapping("/{goalId}")
-    public ResponseEntity<FinancialGoalDto> getFinancialGoalByIdAndBudgetId(@PathVariable Long dashboardId, @PathVariable Long budgetId, @PathVariable Long goalId) {
-        LOG.info("Received request to get financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+    public ResponseEntity<FinancialGoalDto> getFinancialGoalByIdAndDashboardId(@PathVariable Long dashboardId, @PathVariable Long goalId) {
+        LOG.info("Received request to get financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
         try {
-            FinancialGoalDto financialGoalDto = financialGoalService.findFinancialGoalByIdAndBudgetId(dashboardId, budgetId, goalId);
-            LOG.info("Returned financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+            FinancialGoalDto financialGoalDto = financialGoalService.findFinancialGoalByIdAndDashboardId(dashboardId, goalId);
+            LOG.info("Returned financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
             return ResponseEntity.ok(financialGoalDto);
         } catch (EntityNotFoundException e) {
             LOG.error("Error getting financial goal", e);
@@ -42,19 +42,19 @@ public class FinancialGoalController {
     }
 
     @PostMapping
-    public ResponseEntity<FinancialGoalDto> createFinancialGoal(@PathVariable Long dashboardId, @PathVariable Long budgetId, @RequestBody FinancialGoalDto financialGoalDto) {
-        LOG.info("Received request to create financial goal for dashboard with id: {} and budget id: {}", dashboardId, budgetId);
-        FinancialGoalDto createdFinancialGoalDto = financialGoalService.createFinancialGoal(dashboardId, budgetId, financialGoalDto);
-        LOG.info("Created financial goal for dashboard with id: {} and budget id: {}", dashboardId, budgetId);
+    public ResponseEntity<FinancialGoalDto> createFinancialGoal(@PathVariable Long dashboardId, @RequestBody FinancialGoalDto financialGoalDto) {
+        LOG.info("Received request to create financial goal for dashboard with id: {}", dashboardId);
+        FinancialGoalDto createdFinancialGoalDto = financialGoalService.createFinancialGoal(dashboardId, financialGoalDto);
+        LOG.info("Created financial goal for dashboard with id: {}", dashboardId);
         return new ResponseEntity<>(createdFinancialGoalDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{goalId}")
-    public ResponseEntity<FinancialGoalDto> updateFinancialGoal(@PathVariable Long dashboardId, @PathVariable Long budgetId, @PathVariable Long goalId, @RequestBody FinancialGoalDto financialGoalDto) {
-        LOG.info("Received request to update financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+    public ResponseEntity<FinancialGoalDto> updateFinancialGoal(@PathVariable Long dashboardId, @PathVariable Long goalId, @RequestBody FinancialGoalDto financialGoalDto) {
+        LOG.info("Received request to update financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
         try {
-            FinancialGoalDto updatedFinancialGoalDto = financialGoalService.updateFinancialGoal(dashboardId, budgetId, goalId, financialGoalDto);
-            LOG.info("Updated financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+            FinancialGoalDto updatedFinancialGoalDto = financialGoalService.updateFinancialGoal(dashboardId, goalId, financialGoalDto);
+            LOG.info("Updated financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
             return ResponseEntity.ok(updatedFinancialGoalDto);
         } catch (EntityNotFoundException e) {
             LOG.error("Error updating financial goal", e);
@@ -63,11 +63,11 @@ public class FinancialGoalController {
     }
 
     @DeleteMapping("/{goalId}")
-    public ResponseEntity<Void> deleteFinancialGoal(@PathVariable Long dashboardId, @PathVariable Long budgetId, @PathVariable Long goalId) {
-        LOG.info("Received request to delete financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+    public ResponseEntity<Void> deleteFinancialGoal(@PathVariable Long dashboardId, @PathVariable Long goalId) {
+        LOG.info("Received request to delete financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
         try {
-            financialGoalService.deleteFinancialGoal(dashboardId, budgetId, goalId);
-            LOG.info("Deleted financial goal with id: {} for dashboard with id: {} and budget id: {}", goalId, dashboardId, budgetId);
+            financialGoalService.deleteFinancialGoal(dashboardId, goalId);
+            LOG.info("Deleted financial goal with id: {} for dashboard with id: {}", goalId, dashboardId);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             LOG.error("Error deleting financial goal", e);
@@ -75,4 +75,3 @@ public class FinancialGoalController {
         }
     }
 }
-

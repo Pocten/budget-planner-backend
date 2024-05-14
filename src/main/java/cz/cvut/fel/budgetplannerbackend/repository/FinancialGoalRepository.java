@@ -10,11 +10,9 @@ import java.util.Optional;
 @Repository
 public interface FinancialGoalRepository extends JpaRepository<FinancialGoal, Long> {
 
-    List<FinancialGoal> findByBudgetId(Long budgetId);
+    List<FinancialGoal> findByDashboardId(Long dashboardId);
 
-    Optional<FinancialGoal> findByIdAndBudgetId(Long goalId, Long budgetId);
+    Optional<FinancialGoal> findByIdAndDashboardId(Long goalId, Long dashboardId);
 
-    void deleteByBudgetId(Long budgetId);
+    void deleteByDashboardId(Long dashboardId);
 }
-
-

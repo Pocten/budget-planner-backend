@@ -1,7 +1,6 @@
 package cz.cvut.fel.budgetplannerbackend.repository;
 
 import cz.cvut.fel.budgetplannerbackend.entity.FinancialRecord;
-import cz.cvut.fel.budgetplannerbackend.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,9 +25,6 @@ public interface FinancialRecordRepository extends JpaRepository<FinancialRecord
     @Modifying
     @Query("DELETE FROM FinancialRecord fr WHERE fr.dashboard.id = :dashboardId")
     void deleteByDashboardId(@Param("dashboardId") Long dashboardId);
-
-    @Query("SELECT fr FROM FinancialRecord fr JOIN fr.tags t WHERE t = :tag")
-    List<FinancialRecord> findAllWithTag(@Param("tag") Tag tag);
 
     @Query("SELECT SUM(fr.amount) FROM FinancialRecord fr WHERE fr.dashboard.id = :dashboardId AND fr.type = 'INCOME'")
     BigDecimal sumIncomeByDashboardId(@Param("dashboardId") Long dashboardId);

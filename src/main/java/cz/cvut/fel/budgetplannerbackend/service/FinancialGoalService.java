@@ -6,14 +6,14 @@ import java.util.List;
 
 public interface FinancialGoalService {
 
-    List<FinancialGoalDto> findAllFinancialGoalsByBudgetId(Long dashboardId, Long budgetId);
+    List<FinancialGoalDto> findAllFinancialGoalsByDashboardId(Long dashboardId);
 
-    FinancialGoalDto findFinancialGoalByIdAndBudgetId(Long dashboardId, Long budgetId, Long goalId);
+    FinancialGoalDto findFinancialGoalByIdAndDashboardId(Long dashboardId, Long goalId);
 
-    FinancialGoalDto createFinancialGoal(Long dashboardId, Long budgetId, FinancialGoalDto financialGoalDto);
+    FinancialGoalDto createFinancialGoal(Long dashboardId, FinancialGoalDto financialGoalDto);
 
-    FinancialGoalDto updateFinancialGoal(Long dashboardId, Long budgetId, Long goalId, FinancialGoalDto financialGoalDto);
+    FinancialGoalDto updateFinancialGoal(Long dashboardId, Long goalId, FinancialGoalDto financialGoalDto);
 
-    void deleteFinancialGoal(Long dashboardId, Long budgetId, Long goalId);
-
+    void deleteFinancialGoal(Long dashboardId, Long goalId);
 }
+

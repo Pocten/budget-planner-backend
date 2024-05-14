@@ -8,7 +8,6 @@ import cz.cvut.fel.budgetplannerbackend.mapper.FinancialRecordMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
-import cz.cvut.fel.budgetplannerbackend.repository.TagRepository;
 import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.FinancialRecordService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     private final DashboardRepository dashboardRepository;
     private final FinancialRecordMapper financialRecordMapper;
     private final CategoryRepository categoryRepository;
-    private final TagRepository tagRepository;
     private final SecurityUtils securityUtils;
 
     private static final Logger LOG = LoggerFactory.getLogger(FinancialRecordServiceImpl.class);
@@ -80,16 +78,6 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         financialRecord.setDate(financialRecordDto.date() != null ? financialRecordDto.date() : LocalDateTime.now());
         financialRecord.setDescription(financialRecordDto.description());
 
-        if (financialRecordDto.tags() != null) {
-            Set<Tag> tags = financialRecordDto.tags().stream()
-                    .map(tagDto -> tagRepository.findById(tagDto.id())
-                            .orElseThrow(() -> new EntityNotFoundException("Tag", tagDto.id())))
-                    .collect(Collectors.toSet());
-            financialRecord.setTags(tags);
-        } else {
-            financialRecord.setTags(new HashSet<>());
-        }
-
         FinancialRecord savedRecord = financialRecordRepository.save(financialRecord);
         LOG.info("Created new financial record with id: {} for dashboard id: {}", savedRecord.getId(), dashboardId);
         return financialRecordMapper.toDto(savedRecord);
@@ -115,14 +103,6 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
             financialRecord.setCategory(null);
         }
 
-        if (financialRecordDto.tags() != null) {
-            Set<Tag> updatedTags = financialRecordDto.tags().stream()
-                    .map(tagDto -> tagRepository.findById(tagDto.id())
-                            .orElseThrow(() -> new EntityNotFoundException("Tag not found with id: " + tagDto.id())))
-                    .collect(Collectors.toSet());
-            financialRecord.setTags(updatedTags);
-        }
-
         FinancialRecord updatedRecord = financialRecordRepository.save(financialRecord);
         LOG.info("Updated financial record with id: {} for dashboard id: {}", id, dashboardId);
         return financialRecordMapper.toDto(updatedRecord);
@@ -134,7 +114,6 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         LOG.info("Deleting financial record with id: {} for dashboard id: {}", id, dashboardId);
         FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord not found with id: " + id + " for dashboard id: " + dashboardId));
-        financialRecord.getTags().clear();
         financialRecordRepository.delete(financialRecord);
     }
 }

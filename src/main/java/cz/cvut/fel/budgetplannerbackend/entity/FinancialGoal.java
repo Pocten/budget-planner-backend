@@ -21,8 +21,8 @@ public class FinancialGoal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "budget_id")
-    private Budget budget;
+    @JoinColumn(name = "dashboard_id")
+    private Dashboard dashboard;
 
     @Column(name = "title")
     private String title;
@@ -35,5 +35,4 @@ public class FinancialGoal {
 
     @Column(name = "deadline")
     private LocalDate deadline;
-
 }

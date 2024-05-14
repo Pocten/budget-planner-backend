@@ -15,7 +15,6 @@ import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +36,6 @@ public class DashboardServiceImpl implements DashboardService {
     private final DashboardRoleService dashboardRoleService;
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
-    private final TagRepository tagRepository;
     private final FinancialRecordRepository financialRecordRepository;
     private final FinancialGoalRepository financialGoalRepository;
     private final UserRepository userRepository;
@@ -148,37 +146,13 @@ public class DashboardServiceImpl implements DashboardService {
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
 
-        LOG.info("Removing associations between financial records and tags for dashboard id: {}", dashboardId);
-        financialRecordRepository.findAllByDashboardId(dashboardId).forEach(financialRecord -> {
-            financialRecord.getTags().clear();
-            financialRecordRepository.save(financialRecord);
-        });
-
         LOG.info("Deleting all financial goals, budgets, categories, tags, and financial records associated with dashboard id: {}", dashboardId);
         dashboardAccessRepository.deleteByDashboardId(dashboardId);
         dashboardRoleRepository.deleteByDashboardId(dashboardId);
-
-        List<Budget> budgets = budgetRepository.findAllByDashboardId(dashboardId);
-        for (Budget budget : budgets) {
-            financialGoalRepository.deleteByBudgetId(budget.getId());
-            // Log the result after deletion attempt
-            LOG.info("Deleted financial goals for budget id: {}", budget.getId());
-        }
-
-        // Verify that all financial goals are deleted
-        boolean allGoalsDeleted = budgets.stream()
-                .allMatch(budget -> financialGoalRepository.findByBudgetId(budget.getId()).isEmpty());
-        if (allGoalsDeleted) {
-            LOG.info("All financial goals have been deleted, proceeding with budget deletion.");
-            budgetRepository.deleteByDashboardId(dashboardId);
-        } else {
-            LOG.error("Not all financial goals were deleted, aborting further deletions to prevent data integrity issues.");
-            throw new DataIntegrityViolationException("Financial goals still exist, cannot delete budgets.");
-        }
-
+        financialGoalRepository.deleteByDashboardId(dashboardId);
+        budgetRepository.deleteByDashboardId(dashboardId);
         categoryRepository.deleteByDashboardId(dashboardId);
         financialRecordRepository.deleteByDashboardId(dashboardId);
-        tagRepository.deleteByDashboardId(dashboardId);
 
         LOG.info("Dashboard with id: {} successfully deleted, along with all its associated data.", dashboardId);
         dashboardRepository.delete(dashboard);

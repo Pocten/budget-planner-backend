@@ -83,9 +83,6 @@ public class BudgetServiceImpl implements BudgetService {
         Budget budget = budgetRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + id + " for dashboard id: " + dashboardId));
 
-        LOG.info("Deleting all financial goals associated with budget id: {}", id);
-        financialGoalRepository.deleteByBudgetId(budget.getId());
-
         LOG.info("Budget with id: {} successfully deleted, along with all its associated financial goals.", id);
         budgetRepository.delete(budget);
     }

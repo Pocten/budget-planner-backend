@@ -4,7 +4,6 @@ import cz.cvut.fel.budgetplannerbackend.dto.CategoryPriorityDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import cz.cvut.fel.budgetplannerbackend.entity.CategoryPriority;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
-import cz.cvut.fel.budgetplannerbackend.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

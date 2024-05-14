@@ -80,25 +80,31 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
         LOG.info("Calculating priority for categoryId: {} on dashboardId: {}", categoryId, dashboardId);
 
         List<CategoryPriority> priorities = categoryPriorityRepository.findByCategoryIdAndDashboardId(categoryId, dashboardId);
-        double totalPriority = 0;
-        double totalWeight = 0;
+        BigDecimal totalPriority = BigDecimal.ZERO;
+        BigDecimal totalWeight = BigDecimal.ZERO;
 
         for (CategoryPriority cp : priorities) {
             double roleWeight = getRoleWeight(cp.getUser().getId(), dashboardId);
             double incomeWeight = getIncomeWeight(cp.getUser().getId(), dashboardId);
             double combinedWeight = (roleWeight * 0.5) + (incomeWeight * 0.5);
-            totalPriority += cp.getPriority() * combinedWeight;
-            totalWeight += combinedWeight;
+
+            BigDecimal priority = BigDecimal.valueOf(cp.getPriority());
+            BigDecimal combinedWeightBD = BigDecimal.valueOf(combinedWeight);
+
+            totalPriority = totalPriority.add(priority.multiply(combinedWeightBD));
+            totalWeight = totalWeight.add(combinedWeightBD);
 
             LOG.debug("UserId: {}, RoleWeight: {}, IncomeWeight: {}, CombinedWeight: {}, Priority: {}, TotalPriority: {}, TotalWeight: {}",
                     cp.getUser().getId(), roleWeight, incomeWeight, combinedWeight, cp.getPriority(), totalPriority, totalWeight);
         }
 
-        double calculatedPriority = totalWeight == 0 ? 0 : totalPriority / totalWeight;
+        BigDecimal calculatedPriorityBD = totalWeight.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : totalPriority.divide(totalWeight, 2, RoundingMode.HALF_UP);
+        double calculatedPriority = calculatedPriorityBD.doubleValue();
         LOG.info("Calculated priority for categoryId: {} on dashboardId: {} is {}", categoryId, dashboardId, calculatedPriority);
 
         return calculatedPriority;
     }
+
 
     @Override
     public List<CategoryPriorityDto> getCategoryPriorities(Long dashboardId) {
@@ -135,6 +141,11 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
         if (userIncome == null) {
             LOG.warn("No income records found for userId: {} on dashboardId: {}", userId, dashboardId);
             userIncome = BigDecimal.ZERO;
+        }
+
+        if (totalIncome == null) {
+            LOG.warn("No income records found for dashboardId: {}", dashboardId);
+            totalIncome = BigDecimal.ZERO;
         }
 
         double weight = totalIncome.compareTo(BigDecimal.ZERO) == 0 ? 0 : userIncome.divide(totalIncome, RoundingMode.HALF_UP).doubleValue();

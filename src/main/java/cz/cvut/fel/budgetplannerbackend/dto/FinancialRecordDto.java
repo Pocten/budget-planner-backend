@@ -14,7 +14,6 @@ public record FinancialRecordDto(
         CategoryDto category, // Can be null
         ERecordType type,
         LocalDateTime date,
-        String description,
-        Set<TagDto> tags // Can be null
+        String description // Can be null
 ) {
 }

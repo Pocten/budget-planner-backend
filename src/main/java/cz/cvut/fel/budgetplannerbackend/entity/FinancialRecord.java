@@ -10,8 +10,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "financial_records")
@@ -51,13 +49,5 @@ public class FinancialRecord {
 
     @Column(name = "description", length = 500)
     private String description;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "financial_record_tag",
-            joinColumns = @JoinColumn(name = "financial_record_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
 
 }
