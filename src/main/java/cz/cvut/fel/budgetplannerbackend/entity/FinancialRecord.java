@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -43,9 +42,8 @@ public class FinancialRecord {
     @Column(name = "type", nullable = false)
     private ERecordType type;
 
-    @CreationTimestamp
     @Column(name = "date", nullable = false)
-    private LocalDateTime date = LocalDateTime.now();
+    private LocalDateTime date;
 
     @Column(name = "description", length = 500)
     private String description;
