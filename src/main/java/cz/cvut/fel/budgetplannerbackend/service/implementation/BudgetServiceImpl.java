@@ -3,11 +3,13 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 import cz.cvut.fel.budgetplannerbackend.dto.BudgetDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Budget;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.BudgetMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.BudgetRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialGoalRepository;
+import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.BudgetService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,13 +25,15 @@ public class BudgetServiceImpl implements BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final DashboardRepository dashboardRepository;
-    private final FinancialGoalRepository financialGoalRepository;
     private final BudgetMapper budgetMapper;
+    private final SecurityUtils securityUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(BudgetServiceImpl.class);
 
     @Override
     @Transactional(readOnly = true)
     public List<BudgetDto> findAllBudgetsByDashboardId(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all budgets for dashboard id: {}", dashboardId);
         List<Budget> budgets = budgetRepository.findAllByDashboardId(dashboardId);
         return budgets.stream()
@@ -40,6 +44,7 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional(readOnly = true)
     public BudgetDto findBudgetByIdAndDashboardId(Long id, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching budget with id: {} for dashboard id: {}", id, dashboardId);
         Budget budget = budgetRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + id + " for dashboard id: " + dashboardId));
@@ -49,6 +54,7 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public BudgetDto createBudget(Long dashboardId, BudgetDto budgetDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Creating new budget for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -61,6 +67,7 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public BudgetDto updateBudget(Long dashboardId, Long id, BudgetDto budgetDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Updating budget with id: {} for dashboard id: {}", id, dashboardId);
         Budget budget = budgetRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + id + " for dashboard id: " + dashboardId));
@@ -79,6 +86,7 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public void deleteBudget(Long dashboardId, Long id) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Initiating deletion of budget with id: {} for dashboard id: {}", id, dashboardId);
         Budget budget = budgetRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + id + " for dashboard id: " + dashboardId));

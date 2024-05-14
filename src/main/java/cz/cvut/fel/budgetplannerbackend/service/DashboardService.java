@@ -9,11 +9,11 @@ import java.util.List;
 public interface DashboardService {
     List<DashboardDto> findAllDashboardsByUserId(Long userId);
 
-    DashboardDto findUserDashboardById(Long userId, Long id);
+    DashboardDto findUserDashboardById(Long userId, Long dashboardId);
 
     DashboardDto findDashboardById(Long dashboardId);
 
-    List<DashboardDto> findAccessibleDashboards(Long userId);
+    List<DashboardDto> findAccessibleDashboards();
 
     DashboardDto createDashboard(Long userId, DashboardDto dashboardDto);
 

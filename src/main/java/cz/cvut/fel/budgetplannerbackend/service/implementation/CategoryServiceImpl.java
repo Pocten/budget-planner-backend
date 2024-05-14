@@ -3,11 +3,13 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
+import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,11 +27,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final DashboardRepository dashboardRepository;
     private final FinancialRecordRepository financialRecordRepository;
     private final CategoryMapper categoryMapper;
+    private final SecurityUtils securityUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Override
     @Transactional(readOnly = true)
     public List<CategoryDto> findAllCategoriesByDashboardId(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all categories for dashboard id: {}", dashboardId);
         List<Category> categories = categoryRepository.findAllByDashboardId(dashboardId);
         return categories.stream()
@@ -40,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public CategoryDto findCategoryByIdAndDashboardId(Long id, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
@@ -49,6 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto createCategory(Long dashboardId, CategoryDto categoryDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Creating new category for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -61,6 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(Long dashboardId, Long id, CategoryDto categoryDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Updating category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
@@ -80,6 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long dashboardId, Long id) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Initiating deletion of category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));

@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -42,12 +41,15 @@ public class SecurityUtils {
         LOG.info("User with id {} authorized successfully for access to user with id {}", currentUser.getId(), userId);
     }
 
-    public void checkAccessLevel(Long userId, Long dashboardId, EAccessLevel requiredLevel) {
-        Optional<DashboardAccess> access = dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId);
-        if (access.isEmpty() || access.get().getAccessLevel().getLevel().compareTo(requiredLevel) < 0) {
-            LOG.error("User with id {} does not have required access level {} for dashboard with id {}", userId, requiredLevel, dashboardId);
-            throw new AccessDeniedException("Insufficient permissions.");
+    public void checkDashboardAccess(Long dashboardId, EAccessLevel minimumAccessLevel) {
+        User currentUser = getCurrentUser();
+        DashboardAccess access = dashboardAccessRepository.findByUserIdAndDashboardId(currentUser.getId(), dashboardId)
+                .orElseThrow(() -> new AccessDeniedException("Access to dashboard is denied"));
+
+        if (access.getAccessLevel().getLevel().compareTo(minimumAccessLevel) < 0) {
+            LOG.error("User with id {} tried to access dashboard with id {} with insufficient permission", currentUser.getId(), dashboardId);
+            throw new AccessDeniedException("Insufficient permission");
         }
-        LOG.info("Access level check passed for user id {} on dashboard id {}", userId, dashboardId);
+        LOG.info("Access granted for user {} with access level {} on dashboard {}", currentUser.getId(), access.getAccessLevel().getLevel(), dashboardId);
     }
 }

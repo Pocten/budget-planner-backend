@@ -4,11 +4,13 @@ import cz.cvut.fel.budgetplannerbackend.dto.FinancialGoalDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Budget;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.FinancialGoal;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.FinancialGoalMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.BudgetRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialGoalRepository;
+import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.FinancialGoalService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,11 +27,14 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
     private final FinancialGoalRepository financialGoalRepository;
     private final DashboardRepository dashboardRepository;  // Changed from BudgetRepository
     private final FinancialGoalMapper financialGoalMapper;
+    private final SecurityUtils securityUtils;
+
     private static final Logger LOG = LoggerFactory.getLogger(FinancialGoalServiceImpl.class);
 
     @Override
     @Transactional(readOnly = true)
     public List<FinancialGoalDto> findAllFinancialGoalsByDashboardId(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all financial goals for dashboard id: {}", dashboardId);
         List<FinancialGoal> financialGoals = financialGoalRepository.findByDashboardId(dashboardId);
         return financialGoals.stream()
@@ -40,6 +45,7 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
     @Override
     @Transactional(readOnly = true)
     public FinancialGoalDto findFinancialGoalByIdAndDashboardId(Long dashboardId, Long goalId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching financial goal with id: {} for dashboard id: {}", goalId, dashboardId);
         FinancialGoal financialGoal = financialGoalRepository.findByIdAndDashboardId(goalId, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialGoal not found with id: " + goalId + " for dashboard id: " + dashboardId));
@@ -49,6 +55,7 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
     @Override
     @Transactional
     public FinancialGoalDto createFinancialGoal(Long dashboardId, FinancialGoalDto financialGoalDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Creating new financial goal for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -61,6 +68,7 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
     @Override
     @Transactional
     public FinancialGoalDto updateFinancialGoal(Long dashboardId, Long goalId, FinancialGoalDto financialGoalDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Updating financial goal with id: {} for dashboard id: {}", goalId, dashboardId);
         FinancialGoal financialGoal = financialGoalRepository.findByIdAndDashboardId(goalId, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialGoal not found with id: " + goalId + " for dashboard id: " + dashboardId));
@@ -78,6 +86,7 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
     @Override
     @Transactional
     public void deleteFinancialGoal(Long dashboardId, Long goalId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Deleting financial goal with id: {} for dashboard id: {}", goalId, dashboardId);
         FinancialGoal financialGoal = financialGoalRepository.findByIdAndDashboardId(goalId, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialGoal not found with id: " + goalId + " for dashboard id: " + dashboardId));

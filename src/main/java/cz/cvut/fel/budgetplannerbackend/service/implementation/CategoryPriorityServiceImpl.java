@@ -4,6 +4,7 @@ import cz.cvut.fel.budgetplannerbackend.dto.CategoryPriorityDto;
 import cz.cvut.fel.budgetplannerbackend.entity.CategoryPriority;
 import cz.cvut.fel.budgetplannerbackend.entity.DashboardRole;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryPriorityMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.*;
@@ -77,6 +78,7 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
 
     @Override
     public double calculateCategoryPriority(Long categoryId, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Calculating priority for categoryId: {} on dashboardId: {}", categoryId, dashboardId);
 
         List<CategoryPriority> priorities = categoryPriorityRepository.findByCategoryIdAndDashboardId(categoryId, dashboardId);
@@ -108,6 +110,7 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
 
     @Override
     public List<CategoryPriorityDto> getCategoryPriorities(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all priorities for dashboardId: {}", dashboardId);
         List<CategoryPriorityDto> priorities = categoryPriorityRepository.findByDashboardId(dashboardId).stream()
                 .map(categoryPriorityMapper::toDto)

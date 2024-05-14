@@ -2,6 +2,7 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.FinancialRecordDto;
 import cz.cvut.fel.budgetplannerbackend.entity.*;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERecordType;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.FinancialRecordMapper;
@@ -34,6 +35,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @Transactional(readOnly = true)
     public List<FinancialRecordDto> findAllFinancialRecordsByDashboardId(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all financial records for dashboard id: {}", dashboardId);
         List<FinancialRecord> financialRecords = financialRecordRepository.findAllByDashboardId(dashboardId);
         return financialRecords.stream()
@@ -44,6 +46,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @Transactional(readOnly = true)
     public FinancialRecordDto findFinancialRecordByIdAndDashboardId(Long id, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching financial record with id: {} for dashboard id: {}", id, dashboardId);
         FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord", id));
@@ -53,6 +56,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @Transactional
     public FinancialRecordDto createFinancialRecord(Long dashboardId, FinancialRecordDto financialRecordDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Creating financial record for dashboard id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard not found with id: " + dashboardId));
@@ -83,6 +87,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @Transactional
     public FinancialRecordDto updateFinancialRecord(Long id, Long dashboardId, FinancialRecordDto financialRecordDto) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Updating financial record with id: {} for dashboard id: {}", id, dashboardId);
         FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord not found with id: " + id + " for dashboard id: " + dashboardId));
@@ -108,6 +113,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @Transactional
     public void deleteFinancialRecord(Long id, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Deleting financial record with id: {} for dashboard id: {}", id, dashboardId);
         FinancialRecord financialRecord = financialRecordRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("FinancialRecord not found with id: " + id + " for dashboard id: " + dashboardId));

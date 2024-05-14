@@ -1,7 +1,6 @@
 package cz.cvut.fel.budgetplannerbackend.controller;
 
 
-import cz.cvut.fel.budgetplannerbackend.dto.AccessLevelDto;
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
 import cz.cvut.fel.budgetplannerbackend.dto.members.DashboardMemberDto;
 import cz.cvut.fel.budgetplannerbackend.dto.members.MemberRequestDto;
@@ -65,7 +64,7 @@ public class DashboardController {
     public ResponseEntity<List<DashboardDto>> getAccessibleDashboards(@PathVariable Long userId) {
         LOG.info("Received request to get accessible dashboards for user id: {}", userId);
         try {
-            List<DashboardDto> accessibleDashboards = dashboardService.findAccessibleDashboards(userId)
+            List<DashboardDto> accessibleDashboards = dashboardService.findAccessibleDashboards()
                     .stream()
                     .map(dashboard -> dashboardService.findDashboardById(dashboard.id()))
                     .toList();

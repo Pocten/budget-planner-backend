@@ -58,17 +58,18 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public DashboardDto findUserDashboardById(Long userId, Long id) {
-        securityUtils.checkAuthenticatedUser(userId);
-        LOG.info("Getting dashboard with id: {} for user id: {}", id, userId);
-        Dashboard dashboard = dashboardRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new EntityNotFoundException("Dashboard", id));
+    public DashboardDto findUserDashboardById(Long userId, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
+        LOG.info("Getting dashboard with id: {} for user id: {}", dashboardId, userId);
+        Dashboard dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
         return dashboardMapper.toDto(dashboard);
     }
 
     @Override
     @Transactional(readOnly = true)
     public DashboardDto findDashboardById(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Getting dashboard with id: {}", dashboardId);
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -77,24 +78,24 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DashboardDto> findAccessibleDashboards(Long userId) {
-        securityUtils.checkAuthenticatedUser(userId);
-        LOG.info("Fetching accessible dashboards for user id: {}", userId);
+    public List<DashboardDto> findAccessibleDashboards() {
+        User currentUser = securityUtils.getCurrentUser();
+        LOG.info("Fetching accessible dashboards for user id: {}", currentUser.getId());
 
         // We get the IDs of all dashboards to which the user has access
-        List<Long> accessibleDashboardIds = dashboardAccessRepository.findAllByUserId(userId)
+        List<Long> accessibleDashboardIds = dashboardAccessRepository.findAllByUserId(currentUser.getId())
                 .stream()
                 .map(access -> access.getDashboard().getId())
                 .toList();
 
         if (accessibleDashboardIds.isEmpty()) {
-            LOG.info("No accessible dashboards found for user id: {}", userId);
+            LOG.info("No accessible dashboards found for user id: {}", currentUser.getId());
             return List.of();
         }
 
         // Retrieving dashboards based on the received IDs
         List<Dashboard> accessibleDashboards = dashboardRepository.findAllById(accessibleDashboardIds);
-        LOG.info("Found {} accessible dashboards for user id: {}", accessibleDashboards.size(), userId);
+        LOG.info("Found {} accessible dashboards for user id: {}", accessibleDashboards.size(), currentUser.getId());
 
         // Converting dashboards to DTOs
         return accessibleDashboards.stream()
@@ -121,7 +122,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public DashboardDto updateDashboard(Long userId, Long dashboardId, DashboardDto dashboardDto) {
-        securityUtils.checkAuthenticatedUser(userId);
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Updating dashboard with id: {} for user id: {}", dashboardId, userId);
         Dashboard existingDashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -141,7 +142,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void deleteDashboard(Long userId, Long dashboardId) {
-        securityUtils.checkAuthenticatedUser(userId);
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.OWNER);
         LOG.info("Initiating deletion of dashboard with id: {} for user id: {}", dashboardId, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
@@ -162,7 +163,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void addMember(Long dashboardId, String usernameOrEmail, Long userId) throws Exception {
-        securityUtils.checkAuthenticatedUser(userId);
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Attempting to add member to dashboard {}, initiated by user {}", dashboardId, userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
@@ -190,6 +191,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public List<DashboardMemberDto> findMembersByDashboardId(Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Starting to find members for dashboard {}", dashboardId);
         try {
             List<DashboardAccess> accesses = dashboardAccessRepository.findAllByDashboardId(dashboardId);
@@ -222,7 +224,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void changeAccessLevel(Long dashboardId, String usernameOrEmail, Long userId, EAccessLevel newAccessLevelEnum) throws Exception {
-        securityUtils.checkAuthenticatedUser(userId);
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Attempting to change access level for a member on dashboard {}", dashboardId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
@@ -263,7 +265,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public void removeMember(Long dashboardId, String usernameOrEmail, Long userId) throws Exception {
-        securityUtils.checkAuthenticatedUser(userId);
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Attempting to remove member from dashboard {}, initiated by user {}", dashboardId, userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
