@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,35 +45,106 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
 
         securityUtils.checkAuthenticatedUser(currentUser.getId());
 
-        categoryPriorityDto = new CategoryPriorityDto(
-                categoryPriorityDto.id(),
-                currentUser.getId(), // Set the current user's ID
-                categoryPriorityDto.categoryId(),
-                categoryPriorityDto.dashboardId(),
-                categoryPriorityDto.priority()
-        );
+        Optional<CategoryPriority> existingCategoryPriority = categoryPriorityRepository.findByUserIdAndCategoryIdAndDashboardId(
+                currentUser.getId(), categoryPriorityDto.categoryId(), categoryPriorityDto.dashboardId());
+
+        if (existingCategoryPriority.isPresent()) {
+            throw new IllegalArgumentException("Priority for this category, user, and dashboard already exists.");
+        }
 
         CategoryPriority categoryPriority = categoryPriorityMapper.toEntity(categoryPriorityDto);
 
-        LOG.debug("Fetching user with id: {}", categoryPriorityDto.userId());
-        CategoryPriorityDto finalCategoryPriorityDto = categoryPriorityDto;
-        categoryPriority.setUser(userRepository.findById(categoryPriorityDto.userId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + finalCategoryPriorityDto.userId())));
-
-        LOG.debug("Fetching category with id: {}", categoryPriorityDto.categoryId());
-        CategoryPriorityDto finalCategoryPriorityDto1 = categoryPriorityDto;
+        categoryPriority.setUser(userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + currentUser.getId())));
         categoryPriority.setCategory(categoryRepository.findById(categoryPriorityDto.categoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + finalCategoryPriorityDto1.categoryId())));
-
-        LOG.debug("Fetching dashboard with id: {}", categoryPriorityDto.dashboardId());
-        CategoryPriorityDto finalCategoryPriorityDto2 = categoryPriorityDto;
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryPriorityDto.categoryId())));
         categoryPriority.setDashboard(dashboardRepository.findById(categoryPriorityDto.dashboardId())
-                .orElseThrow(() -> new EntityNotFoundException("Dashboard not found with id: " + finalCategoryPriorityDto2.dashboardId())));
+                .orElseThrow(() -> new EntityNotFoundException("Dashboard not found with id: " + categoryPriorityDto.dashboardId())));
 
-        LOG.debug("Saving category priority");
+        LOG.debug("Saving new category priority");
         categoryPriority = categoryPriorityRepository.save(categoryPriority);
 
         LOG.info("Priority set successfully for userId: {}, categoryId: {}, dashboardId: {}", categoryPriorityDto.userId(), categoryPriorityDto.categoryId(), categoryPriorityDto.dashboardId());
+        return categoryPriorityMapper.toDto(categoryPriority);
+    }
+
+    @Override
+    @Transactional
+    public CategoryPriorityDto updateCategoryPriority(CategoryPriorityDto categoryPriorityDto) {
+        User currentUser = securityUtils.getCurrentUser();
+        LOG.info("Updating priority for userId: {}, categoryId: {}, dashboardId: {}, priority: {}",
+                currentUser.getId(), categoryPriorityDto.categoryId(), categoryPriorityDto.dashboardId(), categoryPriorityDto.priority());
+
+        securityUtils.checkAuthenticatedUser(currentUser.getId());
+
+        CategoryPriority categoryPriority = categoryPriorityRepository.findByUserIdAndCategoryIdAndDashboardId(
+                        currentUser.getId(), categoryPriorityDto.categoryId(), categoryPriorityDto.dashboardId())
+                .orElseThrow(() -> new EntityNotFoundException("CategoryPriority not found for userId: "
+                        + currentUser.getId() + ", categoryId: "
+                        + categoryPriorityDto.categoryId() + ", dashboardId: "
+                        + categoryPriorityDto.dashboardId()));
+
+        categoryPriority.setPriority(categoryPriorityDto.priority());
+        categoryPriority = categoryPriorityRepository.save(categoryPriority);
+
+        LOG.info("Priority updated successfully for userId: {}, categoryId: {}, dashboardId: {}", categoryPriorityDto.userId(), categoryPriorityDto.categoryId(), categoryPriorityDto.dashboardId());
+        return categoryPriorityMapper.toDto(categoryPriority);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategoryPriority(Long id) {
+        LOG.info("Deleting priority for categoryPriorityId: {}", id);
+        CategoryPriority categoryPriority = categoryPriorityRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("CategoryPriority not found with id: " + id));
+        categoryPriorityRepository.delete(categoryPriority);
+        LOG.info("Priority deleted successfully for categoryPriorityId: {}", id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategoryPriorityByUserCategoryAndDashboard(Long userId, Long categoryId, Long dashboardId) {
+        LOG.info("Deleting priority for userId: {}, categoryId: {}, dashboardId: {}", userId, categoryId, dashboardId);
+        CategoryPriority categoryPriority = categoryPriorityRepository.findByUserIdAndCategoryIdAndDashboardId(userId, categoryId, dashboardId)
+                .orElseThrow(() -> new EntityNotFoundException("CategoryPriority not found for userId: " + userId + ", categoryId: " + categoryId + ", dashboardId: " + dashboardId));
+        categoryPriorityRepository.delete(categoryPriority);
+        LOG.info("Priority deleted successfully for userId: {}, categoryId: {}, dashboardId: {}", userId, categoryId, dashboardId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryPriorityDto> getCategoryPrioritiesByUserAndDashboard(Long userId, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
+        LOG.info("Fetching priorities for userId: {} and dashboardId: {}", userId, dashboardId);
+        List<CategoryPriority> priorities = categoryPriorityRepository.findByUserIdAndDashboardId(userId, dashboardId);
+        List<CategoryPriorityDto> priorityDtos = priorities.stream()
+                .map(categoryPriorityMapper::toDto)
+                .toList();
+        LOG.info("Fetched {} priorities for userId: {} and dashboardId: {}", priorityDtos.size(), userId, dashboardId);
+        return priorityDtos;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryPriorityDto> getCategoryPrioritiesByCategoryAndDashboard(Long categoryId, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
+        LOG.info("Fetching priorities for categoryId: {} and dashboardId: {}", categoryId, dashboardId);
+        List<CategoryPriority> priorities = categoryPriorityRepository.findByCategoryIdAndDashboardId(categoryId, dashboardId);
+        List<CategoryPriorityDto> priorityDtos = priorities.stream()
+                .map(categoryPriorityMapper::toDto)
+                .toList();
+        LOG.info("Fetched {} priorities for categoryId: {} and dashboardId: {}", priorityDtos.size(), categoryId, dashboardId);
+        return priorityDtos;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryPriorityDto getCategoryPriorityByUserAndCategoryAndDashboard(Long userId, Long categoryId, Long dashboardId) {
+        securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
+        LOG.info("Fetching priority for userId: {}, categoryId: {}, dashboardId: {}", userId, categoryId, dashboardId);
+        CategoryPriority categoryPriority = categoryPriorityRepository.findByUserIdAndCategoryIdAndDashboardId(userId, categoryId, dashboardId)
+                .orElseThrow(() -> new EntityNotFoundException("CategoryPriority not found for userId: " + userId + ", categoryId: " + categoryId + ", dashboardId: " + dashboardId));
+        LOG.info("Fetched priority for userId: {}, categoryId: {}, dashboardId: {}", userId, categoryId, dashboardId);
         return categoryPriorityMapper.toDto(categoryPriority);
     }
 
@@ -107,7 +179,6 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
 
         return calculatedPriority;
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -157,5 +228,4 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
         LOG.debug("Income weight for userId: {} is {}", userId, weight);
         return weight;
     }
-
 }

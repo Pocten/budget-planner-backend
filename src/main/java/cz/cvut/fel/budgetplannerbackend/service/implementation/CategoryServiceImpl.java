@@ -2,10 +2,12 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
+import cz.cvut.fel.budgetplannerbackend.entity.CategoryPriority;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.CategoryMapper;
+import cz.cvut.fel.budgetplannerbackend.repository.CategoryPriorityRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
@@ -24,6 +26,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryPriorityRepository categoryPriorityRepository;
     private final DashboardRepository dashboardRepository;
     private final FinancialRecordRepository financialRecordRepository;
     private final CategoryMapper categoryMapper;
@@ -92,6 +95,9 @@ public class CategoryServiceImpl implements CategoryService {
         LOG.info("Initiating deletion of category with id: {} for dashboard id: {}", id, dashboardId);
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
+
+        LOG.info("Deleting all category priorities associated with category id: {}", id);
+        categoryPriorityRepository.deleteByCategoryId(category.getId());
 
         LOG.info("Setting category_id to null for all financial records associated with category id: {}", id);
         financialRecordRepository.setCategoryToNullByCategoryId(category.getId());

@@ -105,6 +105,48 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
+    @PutMapping("/{categoryId}/priorities")
+    public ResponseEntity<CategoryPriorityDto> updateCategoryPriority(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId,
+            @RequestParam Integer priority,
+            Authentication authentication) {
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            LOG.info("Received request to update priority for userId: {}, categoryId: {}, dashboardId: {}, priority: {}",
+                    userDetails.getUserId(), categoryId, dashboardId, priority);
+            CategoryPriorityDto categoryPriorityDto = new CategoryPriorityDto(
+                    null,
+                    userDetails.getUserId(),
+                    categoryId,
+                    dashboardId,
+                    priority
+            );
+            CategoryPriorityDto updatedPriority = categoryPriorityService.updateCategoryPriority(categoryPriorityDto);
+            LOG.info("Priority updated successfully for userId: {}, categoryId: {}, dashboardId: {}", userDetails.getUserId(), categoryId, dashboardId);
+            return ResponseEntity.ok(updatedPriority);
+        }
+        LOG.warn("User authentication required to update priority");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    }
+
+    @DeleteMapping("/{categoryId}/priorities")
+    public ResponseEntity<Void> deleteCategoryPriority(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId,
+            Authentication authentication) {
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            LOG.info("Received request to delete priority for userId: {}, categoryId: {}, dashboardId: {}",
+                    userDetails.getUserId(), categoryId, dashboardId);
+            categoryPriorityService.deleteCategoryPriorityByUserCategoryAndDashboard(userDetails.getUserId(), categoryId, dashboardId);
+            LOG.info("Priority deleted successfully for userId: {}, categoryId: {}, dashboardId: {}", userDetails.getUserId(), categoryId, dashboardId);
+            return ResponseEntity.noContent().build();
+        }
+        LOG.warn("User authentication required to delete priority");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
     @GetMapping("/{categoryId}/priorities/calculate")
     public ResponseEntity<Double> calculateCategoryPriority(
             @PathVariable Long dashboardId,
@@ -115,6 +157,16 @@ public class CategoryController {
         return ResponseEntity.ok(priority);
     }
 
+    @GetMapping("/{categoryId}/priorities")
+    public ResponseEntity<List<CategoryPriorityDto>> getCategoryPrioritiesByCategoryAndDashboard(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId) {
+        LOG.info("Received request to get priorities for categoryId: {} on dashboardId: {}", categoryId, dashboardId);
+        List<CategoryPriorityDto> priorities = categoryPriorityService.getCategoryPrioritiesByCategoryAndDashboard(categoryId, dashboardId);
+        LOG.info("Returned {} priorities for categoryId: {} on dashboardId: {}", priorities.size(), categoryId, dashboardId);
+        return ResponseEntity.ok(priorities);
+    }
+
     @GetMapping("/priorities")
     public ResponseEntity<List<CategoryPriorityDto>> getCategoryPriorities(@PathVariable Long dashboardId) {
         LOG.info("Received request to get all priorities for dashboardId: {}", dashboardId);
@@ -122,5 +174,21 @@ public class CategoryController {
         LOG.info("Returned {} priorities for dashboardId: {}", priorities.size(), dashboardId);
         return ResponseEntity.ok(priorities);
     }
-}
 
+    @GetMapping("/{categoryId}/priorities/user")
+    public ResponseEntity<CategoryPriorityDto> getCategoryPriorityByUserAndCategoryAndDashboard(
+            @PathVariable Long dashboardId,
+            @PathVariable Long categoryId,
+            Authentication authentication) {
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            LOG.info("Received request to get priority for userId: {}, categoryId: {}, dashboardId: {}",
+                    userDetails.getUserId(), categoryId, dashboardId);
+            CategoryPriorityDto priority = categoryPriorityService.getCategoryPriorityByUserAndCategoryAndDashboard(userDetails.getUserId(), categoryId, dashboardId);
+            LOG.info("Returned priority for userId: {}, categoryId: {}, dashboardId: {}", userDetails.getUserId(), categoryId, dashboardId);
+            return ResponseEntity.ok(priority);
+        }
+        LOG.warn("User authentication required to get priority");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    }
+}
