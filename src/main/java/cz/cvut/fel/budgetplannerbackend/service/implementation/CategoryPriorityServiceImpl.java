@@ -77,6 +77,7 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
     }
 
     @Override
+    @Transactional
     public double calculateCategoryPriority(Long categoryId, Long dashboardId) {
         securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Calculating priority for categoryId: {} on dashboardId: {}", categoryId, dashboardId);
@@ -109,6 +110,7 @@ public class CategoryPriorityServiceImpl implements CategoryPriorityService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryPriorityDto> getCategoryPriorities(Long dashboardId) {
         securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.VIEWER);
         LOG.info("Fetching all priorities for dashboardId: {}", dashboardId);
