@@ -197,6 +197,10 @@ public class DashboardServiceImpl implements DashboardService {
         DashboardAccess newAccess = new DashboardAccess(null, userToAdd, dashboard, viewerAccessLevel);
         dashboardAccessRepository.save(newAccess);
         LOG.info("User {} added to dashboard {} by {}", userToAdd.getUserName(), dashboard.getId(), user.getUserName());
+
+        // Assign role NONE to the new user on this dashboard
+        dashboardRoleService.assignRoleToUserInDashboard(userToAdd.getId(), dashboardId, ERole.NONE);
+        LOG.info("Role NONE assigned to user {} on dashboard {}", userToAdd.getUserName(), dashboardId);
     }
 
     @Override
