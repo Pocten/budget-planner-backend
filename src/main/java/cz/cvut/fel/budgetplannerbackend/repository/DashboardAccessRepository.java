@@ -22,6 +22,11 @@ public interface DashboardAccessRepository extends JpaRepository<DashboardAccess
 
     @Modifying
     @Transactional
+    @Query("DELETE FROM DashboardAccess da WHERE da.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
     @Query("DELETE FROM DashboardAccess da WHERE da.dashboard.id = :dashboardId")
     void deleteByDashboardId(@Param("dashboardId") Long dashboardId);
 

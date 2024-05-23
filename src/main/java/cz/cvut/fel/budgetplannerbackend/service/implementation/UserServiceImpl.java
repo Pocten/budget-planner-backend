@@ -6,7 +6,9 @@ import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityAlreadyExistsException;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
+import cz.cvut.fel.budgetplannerbackend.repository.DashboardAccessRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.DashboardRoleRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
 import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
 import cz.cvut.fel.budgetplannerbackend.service.UserService;
@@ -26,6 +28,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final DashboardRepository dashboardRepository;
     private final DashboardService dashboardService;
+    private final DashboardAccessRepository dashboardAccessRepository;
+    private final DashboardRoleRepository dashboardRoleRepository;
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -97,15 +101,23 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         LOG.info("Deleting user with id: {}", id);
         if (userRepository.existsById(id)) {
-            // Найдем все дашборды пользователя
+            // Find all user dashboards
             List<Dashboard> userDashboards = dashboardRepository.findAllByUserId(id);
 
-            // Удалим все дашборды пользователя через существующий метод deleteDashboard
+            // Delete all user dashboards using the existing deleteDashboard method
             for (Dashboard dashboard : userDashboards) {
                 dashboardService.deleteDashboard(id, dashboard.getId());
             }
 
-            // Удаление самого пользователя
+            // Удаление доступа к дашбордам, связанных с пользователем
+            LOG.info("Deleting dashboard accesses associated with user id: {}", id);
+            dashboardAccessRepository.deleteByUserId(id);
+
+            // Удаление ролей пользователя в дашбордах
+            LOG.info("Deleting dashboard roles associated with user id: {}", id);
+            dashboardRoleRepository.deleteByUserId(id);
+
+            // Deleting the user itself
             userRepository.deleteById(id);
             LOG.info("Deleted user with id: {}", id);
         } else {

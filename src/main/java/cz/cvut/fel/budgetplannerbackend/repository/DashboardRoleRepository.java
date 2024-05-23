@@ -21,6 +21,11 @@ public interface DashboardRoleRepository extends JpaRepository<DashboardRole, Lo
 
     @Modifying
     @Transactional
+    @Query("DELETE FROM DashboardRole dr WHERE dr.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
     @Query("DELETE FROM DashboardRole dr WHERE dr.dashboard.id = :dashboardId")
     void deleteByDashboardId(@Param("dashboardId") Long dashboardId);
 
