@@ -1,5 +1,7 @@
 package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
 
+import cz.cvut.fel.budgetplannerbackend.repository.DashboardAccessRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.DashboardRoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,12 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private DashboardAccessRepository dashboardAccessRepository;
+
+    @Mock
+    private DashboardRoleRepository dashboardRoleRepository;
 
     @Mock
     private DashboardRepository dashboardRepository;
@@ -170,6 +178,8 @@ class UserServiceImplTest {
 
         // Assert
         verify(userRepository, times(1)).deleteById(userId);
+        verify(dashboardAccessRepository, times(1)).deleteByUserId(userId);
+        verify(dashboardRoleRepository, times(1)).deleteByUserId(userId);
     }
 
     @Test
