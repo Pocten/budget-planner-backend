@@ -1,8 +1,5 @@
 openapi: 3.0.0
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/Pocten/Budget_Planner/1.0.0
   - description: Budget Planner API
     url: https://budget-planner-backend-c5122df5a273.herokuapp.com/api/v1
 info:
@@ -10,35 +7,10 @@ info:
   title: Budget Planner API
   description: API for managing personal and family finances.
 paths:
-  /users:
+  /api/auth/login:
     post:
       tags:
-        - User
-      summary: Register a new user.
-      operationId: registerUser
-      requestBody:
-        description: User registration data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '201':
-          description: User registered successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid input data.
-        '500':
-          description: Internal server error.
-
-  /users/login:
-    post:
-      tags:
-        - User
+        - Authentication
       summary: User login endpoint.
       operationId: loginUser
       requestBody:
@@ -47,117 +19,47 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
+              $ref: '#/components/schemas/AuthenticationRequest'
       responses:
         '200':
           description: Login successful.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
+                $ref: '#/components/schemas/AuthenticationResponse'
         '401':
           description: Authentication failed.
         '500':
           description: Internal server error.
-  
-  /users/logout:
+
+  /api/auth/register:
     post:
       tags:
-        - User
-      summary: User logout endpoint.
-      operationId: logoutUser
-      responses:
-        '200':
-          description: Logout successful.
-        '401':
-          description: User not logged in.
-        '500':
-          description: Internal server error.
-          
-  /users/{userId}:
-    get:
-      tags:
-        - User
-      summary: Retrieve user profile information.
-      operationId: getUserProfile
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: User profile retrieved successfull.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: User not found.
-        '500':
-          description: Internal server error.
-    put:
-      tags:
-        - User
-      summary: Update user profile information.
-      operationId: updateUserProfile
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
+        - Authentication
+      summary: Register a new user.
+      operationId: registerUser
       requestBody:
-        description: User updated information.
+        description: User registration data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/RegistrationRequest'
       responses:
         '200':
-          description: User profile updated successfully.
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '400':
           description: Invalid input data.
-        '404':
-          description: User not found.
-        '500':
-          description: Internal server error.
-    delete:
-      tags:
-        - User
-      summary: Delete a user account.
-      operationId: deleteUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: User deleted successfully.
-        '404':
-          description: User not found.
+        '409': # Use 409 Conflict for "already exists" errors
+          description: User already exists.
         '500':
           description: Internal server error.
 
-
-  /users/{userId}/dashboards:
+  /api/v1/users/{userId}/dashboards:
     post:
       tags:
         - Dashboard
@@ -168,28 +70,29 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the user.
       requestBody:
         description: Dashboard creation data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dashboard'
+              $ref: '#/components/schemas/DashboardDto'
       responses:
         '201':
           description: Dashboard created successfully for the specified user.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dashboard'
+                $ref: '#/components/schemas/DashboardDto'
         '400':
           description: Invalid input data.
         '404':
           description: User not found.
         '500':
           description: Internal server error.
-  
+
     get:
       tags:
         - Dashboard
@@ -200,17 +103,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-        - name: page
-          in: query
-          schema:
             type: integer
-            default: 1
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            default: 10
+          description: The ID of the user.
       responses:
         '200':
           description: A list of dashboards for the specified user.
@@ -219,13 +113,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Dashboard'
+                  $ref: '#/components/schemas/DashboardDto'
         '404':
           description: User not found.
         '500':
           description: Internal server error.
 
-  /users/{userId}/dashboards/{dashboardId}:
+  /api/v1/users/{userId}/dashboards/{dashboardId}:
     get:
       tags:
         - Dashboard
@@ -236,19 +130,21 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the user.
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       responses:
         '200':
           description: Dashboard for the specified user retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dashboard'
+                $ref: '#/components/schemas/DashboardDto'
         '404':
           description: User or dashboard not found.
         '500':
@@ -264,26 +160,28 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the user.
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       requestBody:
         description: Dashboard updated information for a specific user.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dashboard'
+              $ref: '#/components/schemas/DashboardDto'
       responses:
         '200':
           description: Dashboard for the specified user updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dashboard'
+                $ref: '#/components/schemas/DashboardDto'
         '400':
           description: Invalid input data.
         '404':
@@ -301,12 +199,14 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the user.
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       responses:
         '204':
           description: Dashboard for the specified user deleted successfully.
@@ -315,8 +215,7 @@ paths:
         '500':
           description: Internal server error.
 
-
-  /dashboards/{dashboardId}/financial-records:
+  /api/v1/dashboards/{dashboardId}/financial-records:
     post:
       tags:
         - Financial Record
@@ -327,28 +226,29 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       requestBody:
         description: Financial record data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FinancialRecord'
+              $ref: '#/components/schemas/FinancialRecordDto'
       responses:
         '201':
           description: Financial record added successfully to the dashboard.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialRecord'
+                $ref: '#/components/schemas/FinancialRecordDto'
         '400':
           description: Invalid input data.
         '404':
           description: User or dashboard not found.
         '500':
           description: Internal server error.
-          
+
     get:
       tags:
         - Financial Record
@@ -359,17 +259,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-        - name: page
-          in: query
-          schema:
             type: integer
-            default: 1
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            default: 10
+          description: The ID of the dashboard.
       responses:
         '200':
           description: A list of financial records for the dashboard.
@@ -378,13 +269,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FinancialRecord'
+                  $ref: '#/components/schemas/FinancialRecordDto'
         '404':
           description: User or dashboard not found.
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/financial-records/{recordId}:
+  /api/v1/dashboards/{dashboardId}/financial-records/{recordId}:
     get:
       tags:
         - Financial Record
@@ -395,19 +286,21 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: recordId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the financial record.
       responses:
         '200':
           description: Financial record retrieved successfully from the dashboard.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialRecord'
+                $ref: '#/components/schemas/FinancialRecordDto'
         '404':
           description: Financial record, user, or dashboard not found.
         '500':
@@ -423,26 +316,28 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: recordId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the financial record.
       requestBody:
         description: Updated financial record data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FinancialRecord'
+              $ref: '#/components/schemas/FinancialRecordDto'
       responses:
         '200':
           description: Financial record updated successfully on the dashboard.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialRecord'
+                $ref: '#/components/schemas/FinancialRecordDto'
         '400':
           description: Invalid input data.
         '404':
@@ -460,12 +355,14 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: recordId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the financial record.
       responses:
         '204':
           description: Financial record deleted successfully from the dashboard.
@@ -474,8 +371,7 @@ paths:
         '500':
           description: Internal server error.
 
-
-  /dashboards/{dashboardId}/budgets:
+  /api/v1/dashboards/{dashboardId}/budgets:
     post:
       tags:
         - Budget
@@ -486,21 +382,22 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       requestBody:
         description: Budget data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Budget'
+              $ref: '#/components/schemas/BudgetDto'
       responses:
         '201':
           description: Budget created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Budget'
+                $ref: '#/components/schemas/BudgetDto'
         '400':
           description: Invalid input data.
         '404':
@@ -517,17 +414,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-        - name: page
-          in: query
-          schema:
             type: integer
-            default: 1
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            default: 10
+          description: The ID of the dashboard.
       responses:
         '200':
           description: A list of budgets.
@@ -536,13 +424,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Budget'
+                  $ref: '#/components/schemas/BudgetDto'
         '404':
           description: Dashboard not found.
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/budgets/{budgetId}:
+  /api/v1/dashboards/{dashboardId}/budgets/{budgetId}:
     get:
       tags:
         - Budget
@@ -553,19 +441,21 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: budgetId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the budget.
       responses:
         '200':
           description: Budget retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Budget'
+                $ref: '#/components/schemas/BudgetDto'
         '404':
           description: Budget or dashboard not found.
         '500':
@@ -581,26 +471,28 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: budgetId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the budget.
       requestBody:
         description: Updated budget data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Budget'
+              $ref: '#/components/schemas/BudgetDto'
       responses:
         '200':
           description: Budget updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Budget'
+                $ref: '#/components/schemas/BudgetDto'
         '400':
           description: Invalid input data.
         '404':
@@ -618,12 +510,14 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: budgetId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the budget.
       responses:
         '204':
           description: Budget deleted successfully.
@@ -632,60 +526,52 @@ paths:
         '500':
           description: Internal server error.
 
-
-  /dashboards/{dashboardId}/budgets/{budgetId}/financial-goals:
+  /api/v1/dashboards/{dashboardId}/financial-goals:
     post:
       tags:
         - Financial Goal
-      summary: Add a new financial goal to a budget within a dashboard.
+      summary: Add a new financial goal to a dashboard.
       operationId: addFinancialGoal
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: budgetId
-          in: path
-          required: true
-          schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       requestBody:
         description: Financial goal data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FinancialGoal'
+              $ref: '#/components/schemas/FinancialGoalDto'
       responses:
         '201':
           description: Financial goal added successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialGoal'
+                $ref: '#/components/schemas/FinancialGoalDto'
         '400':
           description: Invalid input data.
         '404':
-          description: Budget or dashboard not found.
+          description: Dashboard not found.
         '500':
           description: Internal server error.
+
     get:
       tags:
         - Financial Goal
-      summary: Retrieve all financial goals from a specific budget.
+      summary: Retrieve all financial goals from a dashboard.
       operationId: listFinancialGoals
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: budgetId
-          in: path
-          required: true
-          schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       responses:
         '200':
           description: A list of financial goals.
@@ -694,110 +580,105 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FinancialGoal'
+                  $ref: '#/components/schemas/FinancialGoalDto'
         '404':
-          description: Budget or dashboard not found.
+          description: Dashboard not found.
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/budgets/{budgetId}/financial-goals/{goalId}:
+  /api/v1/dashboards/{dashboardId}/financial-goals/{goalId}:
     put:
       tags:
         - Financial Goal
-      summary: Update a financial goal within a specific budget.
+      summary: Update a financial goal within a dashboard.
       operationId: updateFinancialGoal
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: budgetId
-          in: path
-          required: true
-          schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: goalId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the financial goal.
       requestBody:
         description: Updated financial goal data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FinancialGoal'
+              $ref: '#/components/schemas/FinancialGoalDto'
       responses:
         '200':
           description: Financial goal updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialGoal'
+                $ref: '#/components/schemas/FinancialGoalDto'
         '400':
           description: Invalid input data.
         '404':
-          description: Financial goal, budget, or dashboard not found.
+          description: Financial goal or dashboard not found.
         '500':
           description: Internal server error.
 
     delete:
       tags:
         - Financial Goal
-      summary: Delete a financial goal from a specific budget.
+      summary: Delete a financial goal from a dashboard.
       operationId: deleteFinancialGoal
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: budgetId
-          in: path
-          required: true
-          schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: goalId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the financial goal.
       responses:
         '204':
           description: Financial goal deleted successfully.
         '404':
-          description: Financial goal, budget, or dashboard not found.
+          description: Financial goal or dashboard not found.
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/categories:
+  /api/v1/dashboards/{dashboardId}/categories:
     post:
       tags:
         - Category
       summary: Create a new category for financial records.
       operationId: createCategory
-      parameters: 
+      parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
       requestBody:
         description: Category data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryDto'
       responses:
         '201':
           description: Category created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: '#/components/schemas/CategoryDto'
         '400':
           description: Invalid input data.
         '500':
@@ -806,24 +687,15 @@ paths:
     get:
       tags:
         - Category
-      summary: Retrieve a list of all categories.
+      summary: Retrieve a list of all categories for a dashboard.
       operationId: listCategories
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: page
-          in: query
-          schema:
             type: integer
-            default: 1
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            default: 10
+          description: The ID of the dashboard.
       responses:
         '200':
           description: A list of categories.
@@ -832,12 +704,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: '#/components/schemas/CategoryDto'
         '500':
           description: Internal server error.
 
 
-  /dashboards/{dashboardId}/categories/{categoryId}:
+  /api/v1/dashboards/{dashboardId}/categories/{categoryId}:
     put:
       tags:
         - Category
@@ -848,26 +720,28 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: categoryId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the category.
       requestBody:
         description: Updated category data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryDto'
       responses:
         '200':
           description: Category updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: '#/components/schemas/CategoryDto'
         '400':
           description: Invalid input data.
         '404':
@@ -885,12 +759,14 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
         - name: categoryId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the category.
       responses:
         '204':
           description: Category deleted successfully.
@@ -900,7 +776,7 @@ paths:
           description: Internal server error.
 
 
-  /dashboards/{dashboardId}/invite-links:
+  /api/v1/dashboards/{dashboardId}/invite-links:
     post:
       tags:
         - Invite Link
@@ -911,21 +787,15 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-      requestBody:
-        description: Invite link creation data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InviteLink'
+            type: integer
+          description: The ID of the dashboard.
       responses:
         '201':
           description: Invitation link created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InviteLink'
+                $ref: '#/components/schemas/InviteLinkDto'
         '400':
           description: Invalid input data.
         '404':
@@ -933,230 +803,593 @@ paths:
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/invite-links/{linkId}:
-    delete:
+  /api/v1/users/{userId}/dashboards/accessible:
+    get:
       tags:
-        - Invite Link
-      summary: Invalidate an invitation link for a dashboard.
-      operationId: invalidateInviteLink
+        - Dashboard
+      summary: Retrieve a list of accessible dashboards for a user (excluding their own dashboards).
+      operationId: listAccessibleDashboardsForUser
       parameters:
-        - name: dashboardId
+        - name: userId
           in: path
           required: true
           schema:
-            type: string
-        - name: linkId
-          in: path
-          required: true
-          schema:
-            type: string
+            type: integer
+          description: The ID of the user.
       responses:
-        '204':
-          description: Invitation link invalidated successfully.
+        '200':
+          description: A list of dashboards accessible to the user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DashboardDto'
         '404':
-          description: Invitation link or dashboard not found.
+          description: No accessible dashboards found for the user.
         '500':
           description: Internal server error.
 
-
-  /dashboards/{dashboardId}/tags:
+  /api/v1/dashboards/{dashboardId}/members/add:
     post:
       tags:
-        - Tag
-      summary: Create a new tag.
-      operationId: createTag
+        - Dashboard Member
+      summary: Adds a member to a dashboard.
+      operationId: addMemberToDashboard
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user adding the member.
       requestBody:
-        description: Tag creation data.
+        description: Member request data.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Tag'
+              $ref: '#/components/schemas/MemberRequestDto'
       responses:
-        '201':
-          description: Tag created successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tag'
+        '200':
+          description: Member successfully added to the dashboard.
         '400':
-          description: Invalid input data.
+          description: Invalid request data (e.g., missing username or email).
+        '403':
+          description: User is not authorized to add members to this dashboard.
+        '404':
+          description: User or dashboard not found.
         '500':
           description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/members:
     get:
       tags:
-        - Tag
-      summary: Retrieve a list of all tags.
-      operationId: listTags
+        - Dashboard Member
+      summary: Get a list of members of a dashboard.
+      operationId: listMembersOfDashboard
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the dashboard.
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user making the request (for authorization).
       responses:
         '200':
-          description: A list of tags.
+          description: List of members retrieved successfully.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tag'
+                  $ref: '#/components/schemas/DashboardMemberDto'
+        '403':
+          description: User is not authorized to view members of this dashboard.
+        '404':
+          description: Dashboard not found.
         '500':
           description: Internal server error.
 
-  /dashboards/{dashboardId}/tags/{tagId}:
+  /api/v1/dashboards/{dashboardId}/members/{usernameOrEmail}/changeAccess:
     put:
       tags:
-        - Tag
-      summary: Update a specific tag.
-      operationId: updateTag
+        - Dashboard Member
+      summary: Change the access level of a dashboard member.
+      operationId: changeMemberAccessLevel
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: tagId
+            type: integer
+          description: The ID of the dashboard.
+        - name: usernameOrEmail
           in: path
           required: true
           schema:
             type: string
+          description: The username or email of the member.
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user making the change.
       requestBody:
-        description: Updated tag data.
+        description: The new access level for the member.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Tag'
+              type: string
+              enum: [NONE, VIEWER, EDITOR, OWNER] # Provide the enum values
       responses:
         '200':
-          description: Tag updated successfully.
+          description: Access level changed successfully.
+        '400':
+          description: Invalid request data (e.g., invalid access level, member not found).
+        '403':
+          description: User is not authorized to change access levels for this dashboard.
+        '404':
+          description: Dashboard or member not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/members/remove:
+    delete:
+      tags:
+        - Dashboard Member
+      summary: Removes a member from a dashboard.
+      operationId: removeMemberFromDashboard
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the user removing the member.
+      requestBody:
+        description: Member request data.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberRequestDto'
+      responses:
+        '200':
+          description: Member successfully removed from the dashboard.
+        '400':
+          description: Invalid request data (e.g., missing username or email).
+        '403':
+          description: User is not authorized to remove members from this dashboard.
+        '404':
+          description: User or dashboard not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/invite-links/activate/{link}:
+    put:
+      tags:
+        - Invite Link
+      summary: Activate an invite link for a dashboard.
+      operationId: activateInviteLink
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: link
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique invite link string.
+      responses:
+        '200':
+          description: Invite link activated successfully.
+        '404':
+          description: Invite link or dashboard not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/invite-links/deactivate/{link}:
+    put:
+      tags:
+        - Invite Link
+      summary: Deactivate an invite link for a dashboard.
+      operationId: deactivateInviteLink
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: link
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique invite link string.
+      responses:
+        '200':
+          description: Invite link deactivated successfully.
+        '404':
+          description: Invite link or dashboard not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/invite-links/use/{link}:
+    get:
+      tags:
+        - Invite Link
+      summary: Use an invite link to join a dashboard.
+      operationId: useInviteLink
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: link
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique invite link string.
+      responses:
+        '200':
+          description: Access granted or denied based on the invite link validity.
+        '403':
+          description: User authentication required to use the invite link.
+        '404':
+          description: Active invite link not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/categories/{categoryId}/priorities:
+    get:
+      tags:
+        - Category Priority
+      summary: Get all priorities for a category on a dashboard.
+      operationId: getCategoryPrioritiesForCategory
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category.
+      responses:
+        '200':
+          description: A list of CategoryPriorityDto objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryPriorityDto'
+        '403':
+          description: User is not authorized to view data for this dashboard.
+        '404':
+          description: Category or dashboard not found.
+        '500':
+          description: Internal server error.
+
+    post:
+      tags:
+        - Category Priority
+      summary: Set a category priority for the current user on a dashboard.
+      operationId: setCategoryPriority
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category.
+        - name: priority
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: The priority value (higher value means higher priority).
+      responses:
+        '201':
+          description: Category priority set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPriorityDto'
+        '400':
+          description: Invalid input data or priority already exists.
+        '403':
+          description: User authentication required.
+        '404':
+          description: User, category, or dashboard not found.
+        '500':
+          description: Internal server error.
+
+    put:
+      tags:
+        - Category Priority
+      summary: Update a category priority for the current user on a dashboard.
+      operationId: updateCategoryPriority
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category.
+        - name: priority
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: The updated priority value.
+      responses:
+        '200':
+          description: Category priority updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPriorityDto'
         '400':
           description: Invalid input data.
+        '403':
+          description: User authentication required.
         '404':
-          description: Tag not found.
+          description: Category priority not found.
         '500':
           description: Internal server error.
 
     delete:
       tags:
-        - Tag
-      summary: Delete a specific tag.
-      operationId: deleteTag
+        - Category Priority
+      summary: Delete a category priority for the current user on a dashboard.
+      operationId: deleteCategoryPriority
       parameters:
         - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-        - name: tagId
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: The ID of the category.
       responses:
         '204':
-          description: Tag deleted successfully.
+          description: Category priority deleted successfully.
+        '403':
+          description: User authentication required.
         '404':
-          description: Tag not found.
+          description: User, category, or dashboard not found.
         '500':
           description: Internal server error.
 
-
-  /currencies:
+  /api/v1/dashboards/{dashboardId}/categories/{categoryId}/priorities/calculate:
     get:
       tags:
-        - Currency
-      summary: Retrieve all available currencies.
-      operationId: getAllCurrencies
+        - Category Priority
+      summary: Calculate the weighted average priority for a category on a dashboard.
+      operationId: calculateCategoryPriority
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category.
       responses:
         '200':
-          description: List of available currencies.
+          description: The calculated priority value (double).
+          content:
+            application/          application/json:
+              schema:
+                type: number
+                format: double
+        '403':
+          description: User is not authorized to view data for this dashboard.
+        '404':
+          description: Category or dashboard not found.
+        '500':
+          description: Internal server error.
+
+  /api/v1/dashboards/{dashboardId}/categories/priorities:
+    get:
+      tags:
+        - Category Priority
+      summary: Get all priorities for a dashboard.
+      operationId: getAllCategoryPrioritiesForDashboard
+      parameters:
+        - name: dashboardId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the dashboard.
+      responses:
+        '200':
+          description: A list of CategoryPriorityDto objects.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Currency'
+                  $ref: '#/components/schemas/CategoryPriorityDto'
+        '403':
+          description: User is not authorized to view data for this dashboard.
+        '404':
+          description: Dashboard not found.
+        '500':
+          description: Internal server error.
 
-  /currencies/{currencyId}:
-    put:
+  /api/v1/dashboards/{dashboardId}/categories/{categoryId}/priorities/user:
+    get:
       tags:
-        - Currency
-      summary: Update exchange rate for a specific currency.
-      operationId: updateCurrency
+        - Category Priority
+      summary: Get the category priority for the current user on a dashboard.
+      operationId: getCategoryPriorityForUser
       parameters:
-        - name: currencyId
+        - name: dashboardId
           in: path
           required: true
           schema:
-            type: string
-      requestBody:
-        description: Updated exchange rate data.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                exchangeRate:
-                  type: number
-                  format: double
+            type: integer
+          description: The ID of the dashboard.
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category.
       responses:
         '200':
-          description: Currency exchange rate updated successfully.
+          description: The CategoryPriorityDto object for the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPriorityDto'
+        '403':
+          description: User authentication required.
+        '404':
+          description: User, category, or dashboard not found.
+        '500':
+          description: Internal server error.
 
 # Additional endpoints would continue to build out the full API functionality.
-
 
 components:
   schemas:
     User:
       type: object
       required:
-        - userId
-        - email
-        - passwordHash
+        - id
+        - userName
+        - userEmail
+        - userPassword
       properties:
-        userId:
+        id:
           type: integer
           description: Unique identifier of the user.
-        username:
+        userName:
           type: string
           description: Username of the user.
-        email:
+        userEmail:
           type: string
           format: email
           description: Email address of the user.
-        passwordHash:
+        userPassword:
           type: string
           format: password
           description: Hashed password for secure authentication.
-        dateCreated:
+        userDateRegistration:
           type: string
           format: date-time
           description: The date and time when the user account was created.
 
-    Dashboard:
+    AuthenticationRequest:
       type: object
       required:
-        - dashboardId
+        - userName
+        - userPassword
+      properties:
+        userName:
+          type: string
+          description: Username of the user.
+        userPassword:
+          type: string
+          format: password
+          description: Password of the user.
+
+    AuthenticationResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token.
+        tokenType:
+          type: string
+          description: Token type (always "Bearer").
+
+    RegistrationRequest:
+      type: object
+      required:
+        - userName
+        - userEmail
+        - userPassword
+      properties:
+        userName:
+          type: string
+          description: Username of the user.
+        userEmail:
+          type: string
+          format: email
+          description: Email address of the user.
+        userPassword:
+          type: string
+          format: password
+          description: Password of the user.
+
+    DashboardDto:
+      type: object
+      required:
+        - id
         - userId
         - title
       properties:
-        dashboardId:
+        id:
           type: integer
           description: Unique identifier of the dashboard.
         userId:
@@ -1173,17 +1406,22 @@ components:
           format: date-time
           description: The date and time when the dashboard was created.
 
-    FinancialRecord:
+    FinancialRecordDto:
       type: object
       required:
-        - recordId
+        - id
+        - userId
         - dashboardId
         - amount
         - date
+        - type
       properties:
-        recordId:
+        id:
           type: integer
           description: Unique identifier of the financial record.
+        userId:
+          type: integer
+          description: Identifier of the user who created the record.
         dashboardId:
           type: integer
           description: Identifier of the dashboard to which this record belongs.
@@ -1196,23 +1434,26 @@ components:
           description: Category identifier associated with this financial record.
         date:
           type: string
-          format: date
-          description: The date of the financial transaction.
+          format: date-time
+          description: The date and time of the financial transaction.
         description:
           type: string
           description: A brief description or notes about the financial record.
+        type:
+          type: string
+          description: The type of the financial record (INCOME or EXPENSE).
 
-    Budget:
+    BudgetDto:
       type: object
       required:
-        - budgetId
+        - id
         - dashboardId
         - title
         - totalAmount
         - startDate
         - endDate
       properties:
-        budgetId:
+        id:
           type: integer
           description: Unique identifier of the budget.
         dashboardId:
@@ -1234,20 +1475,20 @@ components:
           format: date
           description: End date of the budget period.
 
-    FinancialGoal:
+    FinancialGoalDto:
       type: object
       required:
-        - goalId
-        - budgetId
+        - id
+        - dashboardId
         - title
         - targetAmount
       properties:
-        goalId:
+        id:
           type: integer
           description: Unique identifier of the financial goal.
-        budgetId:
+        dashboardId:
           type: integer
-          description: Identifier of the budget to which this goal is linked.
+          description: Identifier of the dashboard to which this goal is linked.
         title:
           type: string
           description: Title of the financial goal.
@@ -1265,15 +1506,19 @@ components:
           format: date
           description: Deadline to achieve the financial goal.
 
-    Category:
+    CategoryDto:
       type: object
       required:
-        - categoryId
+        - id
         - name
+        - dashboardId
       properties:
-        categoryId:
+        id:
           type: integer
           description: Unique identifier for the category.
+        dashboardId:
+          type: integer
+          description: Identifier of the dashboard to which the category belongs.
         name:
           type: string
           description: The name of the category.
@@ -1281,14 +1526,13 @@ components:
           type: string
           description: An optional description of the category.
 
-    InviteLink:
+    InviteLinkDto:
       type: object
       required:
-        - linkId
         - dashboardId
         - expiryDate
       properties:
-        linkId:
+        id:
           type: integer
           description: Unique identifier for the invite link.
         dashboardId:
@@ -1302,41 +1546,68 @@ components:
           type: string
           format: uri
           description: The URL of the invitation link.
-        isActive:
+        active:
           type: boolean
           default: true
           description: Indicates whether the invite link is active or has been invalidated.
 
-    Tag:
+    MemberRequestDto:
       type: object
       required:
-        - tagId
-        - name
+        - usernameOrEmail
       properties:
-        tagId:
+        usernameOrEmail:
+          type: string
+          description: The username or email of the member to add or remove.
+
+    DashboardMemberDto:
+      type: object
+      properties:
+        userId:
           type: integer
-          description: Unique identifier for the tag.
-        name:
+          description: The ID of the user (member).
+        userName:
           type: string
-          description: Name of the tag.
-        description:
+          description: Username of the member.
+        userEmail:
           type: string
-          description: Optional description of the tag.
-          
-    Currency:
+          description: Email of the member.
+        accessLevel:
+          type: string
+          description: Access level of the member in the dashboard (e.g., OWNER, EDITOR, VIEWER, NONE).
+        role:
+          type: string
+          description: Role of the member in the dashboard (e.g., ENTREPRENEUR, EMPLOYEE).
+
+    CategoryPriorityDto:
       type: object
-      required:
-        - currencyId
-        - name
-        - exchangeRate
       properties:
-        currencyId:
+        id:
+          type: integer
+          description: Unique identifier of the category priority.
+        userId:
+          type: integer
+          description: The ID of the user who set the priority.
+        categoryId:
+          type: integer
+          description: The ID of the category.
+        dashboardId:
+          type: integer
+          description: The ID of the dashboard.
+        priority:
+          type: integer
+          description: The priority value (higher value means higher priority).
+
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the role.
+        role:
           type: string
-          description: Unique identifier for the currency.
-        name:
-          type: string
-          description: The name of the currency, e.g., USD, EUR.
-        exchangeRate:
-          type: number
-          format: double
-          description: The current exchange rate to the base currency.
+          description: The name of the role (e.g., ENTREPRENEUR, EMPLOYEE).
+
+    EAccessLevel:
+      type: string
+      enum: [NONE, VIEWER, EDITOR, OWNER] # Define the possible values for EAccessLevel
