@@ -1,14 +1,18 @@
 package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
-import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
-import cz.cvut.fel.budgetplannerbackend.entity.User;
+import cz.cvut.fel.budgetplannerbackend.entity.*;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
+import cz.cvut.fel.budgetplannerbackend.entity.enums.ERole;
+import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.DashboardMapper;
-import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
+import cz.cvut.fel.budgetplannerbackend.repository.*;
 import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
+import cz.cvut.fel.budgetplannerbackend.service.DashboardAccessService;
+import cz.cvut.fel.budgetplannerbackend.service.DashboardRoleService;
 import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardServiceImplTest {
@@ -34,6 +39,42 @@ class DashboardServiceImplTest {
 
     @Mock
     private SecurityUtils securityUtils;
+
+    @Mock
+    AccessLevelRepository accessLevelRepository;
+
+    @Mock
+    private CategoryPriorityRepository categoryPriorityRepository;
+
+    @Mock
+    private FinancialRecordRepository financialRecordRepository;
+
+    @Mock
+    private FinancialGoalRepository financialGoalRepository;
+
+    @Mock
+    private BudgetRepository budgetRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private DashboardAccessRepository dashboardAccessRepository;
+
+    @Mock
+    private DashboardRoleRepository dashboardRoleRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private DashboardRoleService dashboardRoleService;
+
+    @Mock
+    private DashboardAccessService dashboardAccessService;
 
     @InjectMocks
     private DashboardServiceImpl dashboardService;
@@ -66,7 +107,8 @@ class DashboardServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        Mockito.reset(dashboardRepository, dashboardMapper, securityUtils);
+        Mockito.reset(dashboardRepository, dashboardMapper, securityUtils, dashboardRoleService,
+                dashboardAccessRepository, userRepository, accessLevelRepository, roleRepository);
     }
 
     @Test
@@ -111,176 +153,342 @@ class DashboardServiceImplTest {
     @Test
     void testFindUserDashboardByIdWithValidId() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
+        Dashboard testDashboard = new Dashboard();
+        testDashboard.setId(dashboardId);
+        testDashboard.setUser(testUser);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.of(testDashboard));
+        when(dashboardMapper.toDto(testDashboard)).thenReturn(new DashboardDto(dashboardId, "Title", "Description", LocalDateTime.now(), userId));
 
         // Act
+        DashboardDto result = dashboardService.findUserDashboardById(userId, dashboardId);
 
         // Assert
+        assertNotNull(result);
+        assertEquals(dashboardId, result.id());
+        verify(dashboardRepository, times(1)).findByIdAndUserId(dashboardId, userId);
     }
 
     @Test
     void testFindUserDashboardByIdWithUnauthorizedUser() {
         // Arrange
+        Long dashboardId = 1L;
+        Long userId = 2L;
+        User testUser = new User();
+        testUser.setId(userId);
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.empty());
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.findUserDashboardById(userId, dashboardId));
+        verify(dashboardRepository, times(1)).findByIdAndUserId(dashboardId, userId);
     }
 
     @Test
     void testFindUserDashboardByIdWithNonexistentId() {
         // Arrange
+        Long dashboardId = 1L;
+        Long userId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.empty());
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.findUserDashboardById(userId, dashboardId));
+        verify(dashboardRepository, times(1)).findByIdAndUserId(dashboardId, userId);
     }
-
-    // Tests for the method 'findDashboardById'
 
     @Test
     void testFindDashboardByIdWithValidId() {
         // Arrange
+        Long dashboardId = 1L;
+        Dashboard testDashboard = new Dashboard();
+        testDashboard.setId(dashboardId);
+
+        when(dashboardRepository.findById(dashboardId)).thenReturn(Optional.of(testDashboard));
+        when(dashboardMapper.toDto(testDashboard)).thenReturn(new DashboardDto(dashboardId, "Title", "Description", LocalDateTime.now(), 1L));
 
         // Act
+        DashboardDto result = dashboardService.findDashboardById(dashboardId);
 
         // Assert
+        assertNotNull(result);
+        assertEquals(dashboardId, result.id());
+        verify(dashboardRepository, times(1)).findById(dashboardId);
     }
 
     @Test
     void testFindDashboardByIdWithNonexistentId() {
         // Arrange
+        Long dashboardId = 1L;
 
-        // Act
+        when(dashboardRepository.findById(dashboardId)).thenReturn(Optional.empty());
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.findDashboardById(dashboardId));
+        verify(dashboardRepository, times(1)).findById(dashboardId);
     }
-
-    // Tests for the method 'findAccessibleDashboards'
-
-    @Test
-    void testFindAccessibleDashboardsWithAccess() {
-        // Arrange
-
-        // Act
-
-        // Assert
-    }
-
-    @Test
-    void testFindAccessibleDashboardsWithNoAccess() {
-        // Arrange
-
-        // Act
-
-        // Assert
-    }
-
-    // Tests for the method 'createDashboard'
 
     @Test
     void testCreateDashboardSuccessfully() {
         // Arrange
+        Long userId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setTitle("New Dashboard");
+
+        DashboardDto dashboardDto = new DashboardDto(null, "New Dashboard", "Description", null, userId);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser)); // Добавьте этот мок
+        when(dashboardMapper.toEntity(any(DashboardDto.class))).thenReturn(dashboard);
+        when(dashboardRepository.save(any(Dashboard.class))).thenAnswer(invocation -> {
+            Dashboard savedDashboard = invocation.getArgument(0);
+            savedDashboard.setId(1L);
+            return savedDashboard;
+        });
+        when(dashboardMapper.toDto(any(Dashboard.class))).thenReturn(new DashboardDto(1L, "New Dashboard", "Description", LocalDateTime.now(), userId));
+
+        doNothing().when(dashboardRoleService).assignRoleToUserInDashboard(userId, 1L, ERole.NONE);
+        doNothing().when(dashboardAccessService).grantAccess(userId, 1L, EAccessLevel.OWNER);
 
         // Act
+        DashboardDto result = dashboardService.createDashboard(userId, dashboardDto);
 
         // Assert
+        assertNotNull(result);
+        assertEquals("New Dashboard", result.title());
+        verify(dashboardRepository, times(1)).save(any(Dashboard.class));
+        verify(dashboardRoleService, times(1)).assignRoleToUserInDashboard(userId, 1L, ERole.NONE);
+        verify(dashboardAccessService, times(1)).grantAccess(userId, 1L, EAccessLevel.OWNER);
     }
 
     @Test
     void testCreateDashboardWithUnauthorizedUser() {
         // Arrange
+        Long userId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
 
-        // Act
+        DashboardDto dashboardDto = new DashboardDto(null, "New Dashboard", "Description", null, userId);
 
-        // Assert
+        when(securityUtils.getCurrentUser()).thenReturn(null);
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.createDashboard(userId, dashboardDto));
+        verify(dashboardRepository, never()).save(any(Dashboard.class));
     }
-
-    // Tests for the method 'updateDashboard'
 
     @Test
     void testUpdateDashboardSuccessfully() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
+
+        Dashboard dashboard = new Dashboard();
+        dashboard.setId(dashboardId);
+        dashboard.setUser(testUser);
+
+        DashboardDto dashboardDto = new DashboardDto(dashboardId, "Updated Title", "Updated Description", LocalDateTime.now(), userId);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.of(dashboard));
+        when(dashboardMapper.toEntity(dashboardDto)).thenReturn(dashboard);
+        when(dashboardRepository.save(dashboard)).thenReturn(dashboard);
+        when(dashboardMapper.toDto(dashboard)).thenReturn(dashboardDto);
 
         // Act
+        DashboardDto result = dashboardService.updateDashboard(userId, dashboardId, dashboardDto);
 
         // Assert
+        assertNotNull(result);
+        assertEquals("Updated Title", result.title());
+        verify(dashboardRepository, times(1)).save(dashboard);
     }
 
     @Test
     void testUpdateDashboardWithNonexistentId() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
 
-        // Act
+        DashboardDto dashboardDto = new DashboardDto(dashboardId, "Updated Title", "Updated Description", LocalDateTime.now(), userId);
 
-        // Assert
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.updateDashboard(userId, dashboardId, dashboardDto));
+        verify(dashboardRepository, never()).save(any(Dashboard.class));
     }
 
     @Test
     void testUpdateDashboardWithUnauthorizedAccess() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
 
-        // Act
+        Dashboard dashboard = new Dashboard();
+        dashboard.setId(dashboardId);
+        dashboard.setUser(new User()); // different user
 
-        // Assert
+        DashboardDto dashboardDto = new DashboardDto(dashboardId, "Updated Title", "Updated Description", LocalDateTime.now(), userId);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.updateDashboard(userId, dashboardId, dashboardDto));
+        verify(dashboardRepository, never()).save(any(Dashboard.class));
     }
+
 
     // Tests for the method 'deleteDashboard'
 
     @Test
     void testDeleteDashboardSuccessfully() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
+        Dashboard testDashboard = new Dashboard();
+        testDashboard.setId(dashboardId);
+        testDashboard.setUser(testUser);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.of(testDashboard));
 
         // Act
+        dashboardService.deleteDashboard(userId, dashboardId);
 
         // Assert
+        verify(dashboardRepository, times(1)).delete(testDashboard);
+        verify(categoryPriorityRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(financialRecordRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(financialGoalRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(budgetRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(categoryRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(dashboardAccessRepository, times(1)).deleteByDashboardId(dashboardId);
+        verify(dashboardRoleRepository, times(1)).deleteByDashboardId(dashboardId);
     }
+
 
     @Test
     void testDeleteDashboardWithNonexistentId() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 999L;
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(new User());
+        when(dashboardRepository.findByIdAndUserId(dashboardId, userId)).thenReturn(Optional.empty());
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.deleteDashboard(userId, dashboardId));
     }
+
 
     @Test
     void testDeleteDashboardWithUnauthorizedUser() {
         // Arrange
+        Long userId = 1L;
+        Long dashboardId = 1L;
+        User unauthorizedUser = new User();
+        unauthorizedUser.setId(2L);
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(unauthorizedUser);
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.deleteDashboard(userId, dashboardId));
     }
 
     // Tests for the method 'addMember'
 
     @Test
-    void testAddMemberSuccessfully() {
+    void testAddMemberSuccessfully() throws Exception {
         // Arrange
+        Long dashboardId = 1L;
+        String usernameOrEmail = "testUser2";
+        Long userId = 1L;
+        User testUser = new User();
+        testUser.setId(userId);
+        Dashboard testDashboard = new Dashboard();
+        testDashboard.setId(dashboardId);
+        User userToAdd = new User();
+        userToAdd.setId(2L);
+        userToAdd.setUserName(usernameOrEmail);
+
+        AccessLevel viewerAccessLevel = new AccessLevel();
+        viewerAccessLevel.setLevel(EAccessLevel.VIEWER);
+
+        Role noneRole = new Role();
+        noneRole.setName(ERole.NONE);
+
+        DashboardAccess existingAccess = new DashboardAccess();
+        existingAccess.setAccessLevel(viewerAccessLevel);
+
+        when(securityUtils.getCurrentUser()).thenReturn(testUser);
+        when(dashboardRepository.findById(dashboardId)).thenReturn(Optional.of(testDashboard));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(userRepository.findUserByUserNameOrUserEmail(usernameOrEmail)).thenReturn(Optional.of(userToAdd));
+        when(dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId)).thenReturn(Optional.of(existingAccess));
+        when(accessLevelRepository.findByLevel(EAccessLevel.VIEWER)).thenReturn(Optional.of(viewerAccessLevel));
+        when(roleRepository.findByName(ERole.NONE)).thenReturn(Optional.of(noneRole));
 
         // Act
+        dashboardService.addMember(dashboardId, usernameOrEmail, userId);
 
         // Assert
+        verify(dashboardAccessRepository, times(1)).save(any(DashboardAccess.class));
+        verify(dashboardRoleService, times(1)).assignRoleToUserInDashboard(userToAdd.getId(), dashboardId, ERole.NONE);
     }
 
     @Test
     void testAddMemberWithNonexistentDashboard() {
         // Arrange
+        Long dashboardId = 999L;
+        String usernameOrEmail = "testUser2";
+        Long userId = 1L;
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(new User());
+        when(dashboardRepository.findById(dashboardId)).thenReturn(Optional.empty());
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.addMember(dashboardId, usernameOrEmail, userId));
     }
+
 
     @Test
     void testAddMemberWithUnauthorizedUser() {
         // Arrange
+        Long dashboardId = 1L;
+        String usernameOrEmail = "testUser2";
+        Long userId = 1L;
+        User unauthorizedUser = new User();
+        unauthorizedUser.setId(2L);
 
-        // Act
+        when(securityUtils.getCurrentUser()).thenReturn(unauthorizedUser);
 
-        // Assert
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> dashboardService.addMember(dashboardId, usernameOrEmail, userId));
     }
+
 
 
     // Tests for the method 'findMembersByDashboardId'

@@ -8,6 +8,7 @@ import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
+import cz.cvut.fel.budgetplannerbackend.service.DashboardService;
 import cz.cvut.fel.budgetplannerbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final DashboardRepository dashboardRepository;
+    private final DashboardService dashboardService;
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -95,11 +97,15 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         LOG.info("Deleting user with id: {}", id);
         if (userRepository.existsById(id)) {
+            // Найдем все дашборды пользователя
             List<Dashboard> userDashboards = dashboardRepository.findAllByUserId(id);
-            if (!userDashboards.isEmpty()) {
-                dashboardRepository.deleteAll(userDashboards);
-                LOG.info("Deleted all dashboards for user with id: {}", id);
+
+            // Удалим все дашборды пользователя через существующий метод deleteDashboard
+            for (Dashboard dashboard : userDashboards) {
+                dashboardService.deleteDashboard(id, dashboard.getId());
             }
+
+            // Удаление самого пользователя
             userRepository.deleteById(id);
             LOG.info("Deleted user with id: {}", id);
         } else {

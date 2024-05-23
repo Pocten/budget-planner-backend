@@ -2,7 +2,6 @@ package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Category;
-import cz.cvut.fel.budgetplannerbackend.entity.CategoryPriority;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
