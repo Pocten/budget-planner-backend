@@ -36,6 +36,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final DashboardRoleService dashboardRoleService;
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryPriorityRepository categoryPriorityRepository;
     private final FinancialRecordRepository financialRecordRepository;
     private final FinancialGoalRepository financialGoalRepository;
     private final UserRepository userRepository;
@@ -149,6 +150,10 @@ public class DashboardServiceImpl implements DashboardService {
         LOG.info("Initiating deletion of dashboard with id: {} for user id: {}", dashboardId, userId);
         Dashboard dashboard = dashboardRepository.findByIdAndUserId(dashboardId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
+
+        // Удаление приоритетов категорий, связанных с дашбордом
+        LOG.info("Deleting category priorities associated with dashboard id: {}", dashboardId);
+        categoryPriorityRepository.deleteByDashboardId(dashboardId);
 
         // Удаление или обновление financial records, которые могут ссылаются на categories или budgets
         LOG.info("Deleting financial records associated with dashboard id: {}", dashboardId);
