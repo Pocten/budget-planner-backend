@@ -304,6 +304,14 @@ public class DashboardServiceImpl implements DashboardService {
         User userToRemove = userRepository.findUserByUserNameOrUserEmail(usernameOrEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username/email: " + usernameOrEmail));
 
+        // Check if the user to remove is the owner
+        Optional<DashboardAccess> userToRemoveAccess = dashboardAccessRepository.findByUserIdAndDashboardId(userToRemove.getId(), dashboardId);
+        if (userToRemoveAccess.isPresent() && userToRemoveAccess.get().getAccessLevel().getLevel() == EAccessLevel.OWNER) {
+            LOG.error("User {} attempted to remove the owner of dashboard {}", userId, dashboardId);
+            throw new AccessDeniedException("The owner of the dashboard cannot be removed.");
+        }
+
+        // Check if the user attempting to remove has NONE access level
         Optional<DashboardAccess> access = dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId);
         if (access.isPresent() && access.get().getAccessLevel().getLevel() == EAccessLevel.NONE) {
             LOG.error("User {} attempted to remove member with NONE access level on dashboard {}", userId, dashboardId);
@@ -316,4 +324,5 @@ public class DashboardServiceImpl implements DashboardService {
                     LOG.info("User {} removed from dashboard {} by {}", userToRemove.getUserName(), dashboard.getId(), user.getUserName());
                 });
     }
+
 }
