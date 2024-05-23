@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.entity.AccessLevel;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
@@ -10,7 +10,6 @@ import cz.cvut.fel.budgetplannerbackend.repository.AccessLevelRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardAccessRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardAccessServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

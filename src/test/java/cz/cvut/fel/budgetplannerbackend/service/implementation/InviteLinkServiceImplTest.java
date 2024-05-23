@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.InviteLinkDto;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
@@ -9,9 +9,6 @@ import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.InviteLinkMapper;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.InviteLinkRepository;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardAccessServiceImpl;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardRoleServiceImpl;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.InviteLinkServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

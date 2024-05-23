@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -13,7 +13,6 @@ import cz.cvut.fel.budgetplannerbackend.repository.*;
 import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
 import cz.cvut.fel.budgetplannerbackend.service.DashboardAccessService;
 import cz.cvut.fel.budgetplannerbackend.service.DashboardRoleService;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

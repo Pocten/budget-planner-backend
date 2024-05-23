@@ -1,13 +1,11 @@
 package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.FinancialGoalDto;
-import cz.cvut.fel.budgetplannerbackend.entity.Budget;
 import cz.cvut.fel.budgetplannerbackend.entity.Dashboard;
 import cz.cvut.fel.budgetplannerbackend.entity.FinancialGoal;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.EAccessLevel;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.mapper.FinancialGoalMapper;
-import cz.cvut.fel.budgetplannerbackend.repository.BudgetRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialGoalRepository;
 import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
@@ -17,20 +15,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
+/**
+ * Service class for managing financial goals.
+ */
 @Service
 @RequiredArgsConstructor
 public class FinancialGoalServiceImpl implements FinancialGoalService {
 
     private final FinancialGoalRepository financialGoalRepository;
-    private final DashboardRepository dashboardRepository;  // Changed from BudgetRepository
+    private final DashboardRepository dashboardRepository;
     private final FinancialGoalMapper financialGoalMapper;
     private final SecurityUtils securityUtils;
 
     private static final Logger LOG = LoggerFactory.getLogger(FinancialGoalServiceImpl.class);
 
+    /**
+     * Retrieves all financial goals associated with a specific dashboard.
+     *
+     * @param dashboardId The ID of the dashboard.
+     * @return A list of financial goal DTOs.
+     * @throws AccessDeniedException If the user does not have viewer access to the dashboard.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<FinancialGoalDto> findAllFinancialGoalsByDashboardId(Long dashboardId) {
@@ -42,6 +51,15 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
                 .toList();
     }
 
+    /**
+     * Retrieves a specific financial goal by its ID and dashboard ID.
+     *
+     * @param dashboardId The ID of the dashboard.
+     * @param goalId      The ID of the financial goal.
+     * @return The financial goal DTO.
+     * @throws EntityNotFoundException If the financial goal is not found.
+     * @throws AccessDeniedException If the user does not have viewer access to the dashboard.
+     */
     @Override
     @Transactional(readOnly = true)
     public FinancialGoalDto findFinancialGoalByIdAndDashboardId(Long dashboardId, Long goalId) {
@@ -52,6 +70,15 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
         return financialGoalMapper.toDto(financialGoal);
     }
 
+    /**
+     * Creates a new financial goal.
+     *
+     * @param dashboardId      The ID of the dashboard to associate the financial goal with.
+     * @param financialGoalDto The financial goal DTO containing the data for the new goal.
+     * @return The created financial goal DTO.
+     * @throws EntityNotFoundException If the dashboard is not found.
+     * @throws AccessDeniedException If the user does not have editor access to the dashboard.
+     */
     @Override
     @Transactional
     public FinancialGoalDto createFinancialGoal(Long dashboardId, FinancialGoalDto financialGoalDto) {
@@ -65,6 +92,16 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
         return financialGoalMapper.toDto(savedFinancialGoal);
     }
 
+    /**
+     * Updates an existing financial goal.
+     *
+     * @param dashboardId      The ID of the dashboard associated with the financial goal.
+     * @param goalId           The ID of the financial goal to update.
+     * @param financialGoalDto The financial goal DTO containing the updated data.
+     * @return The updated financial goal DTO.
+     * @throws EntityNotFoundException If the financial goal is not found.
+     * @throws AccessDeniedException If the user does not have editor access to the dashboard.
+     */
     @Override
     @Transactional
     public FinancialGoalDto updateFinancialGoal(Long dashboardId, Long goalId, FinancialGoalDto financialGoalDto) {
@@ -83,6 +120,14 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
         return financialGoalMapper.toDto(updatedFinancialGoal);
     }
 
+    /**
+     * Deletes a financial goal.
+     *
+     * @param dashboardId The ID of the dashboard associated with the financial goal.
+     * @param goalId      The ID of the financial goal to delete.
+     * @throws EntityNotFoundException If the financial goal is not found.
+     * @throws AccessDeniedException If the user does not have editor access to the dashboard.
+     */
     @Override
     @Transactional
     public void deleteFinancialGoal(Long dashboardId, Long goalId) {

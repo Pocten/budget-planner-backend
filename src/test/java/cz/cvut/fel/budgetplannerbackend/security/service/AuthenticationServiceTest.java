@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.security.service;
+package cz.cvut.fel.budgetplannerbackend.security.service;
 
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
@@ -6,8 +6,6 @@ import cz.cvut.fel.budgetplannerbackend.mapper.UserMapper;
 import cz.cvut.fel.budgetplannerbackend.security.jwt.JwtTokenProvider;
 import cz.cvut.fel.budgetplannerbackend.security.model.authentication.AuthenticationRequest;
 import cz.cvut.fel.budgetplannerbackend.security.model.registration.RegistrationRequest;
-import cz.cvut.fel.budgetplannerbackend.security.service.AuthenticationService;
-import cz.cvut.fel.budgetplannerbackend.security.service.CustomUserDetailsService;
 import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

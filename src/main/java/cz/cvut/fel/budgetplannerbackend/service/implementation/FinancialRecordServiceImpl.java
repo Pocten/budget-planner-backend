@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service class for managing financial records.
+ */
 @Service
 @RequiredArgsConstructor
 public class FinancialRecordServiceImpl implements FinancialRecordService {
@@ -32,6 +35,12 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FinancialRecordServiceImpl.class);
 
+    /**
+     * Retrieves all financial records associated with a specific dashboard.
+     *
+     * @param dashboardId The ID of the dashboard.
+     * @return A list of financial record DTOs.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<FinancialRecordDto> findAllFinancialRecordsByDashboardId(Long dashboardId) {
@@ -43,6 +52,14 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
                 .toList();
     }
 
+    /**
+     * Retrieves a specific financial record by its ID and dashboard ID.
+     *
+     * @param id          The ID of the financial record.
+     * @param dashboardId The ID of the dashboard.
+     * @return The financial record DTO.
+     * @throws EntityNotFoundException If the financial record is not found.
+     */
     @Override
     @Transactional(readOnly = true)
     public FinancialRecordDto findFinancialRecordByIdAndDashboardId(Long id, Long dashboardId) {
@@ -53,6 +70,14 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         return financialRecordMapper.toDto(financialRecord);
     }
 
+    /**
+     * Creates a new financial record.
+     *
+     * @param dashboardId          The ID of the dashboard to associate the financial record with.
+     * @param financialRecordDto The financial record DTO containing the data for the new record.
+     * @return The created financial record DTO.
+     * @throws EntityNotFoundException If the dashboard or category (if provided) is not found.
+     */
     @Override
     @Transactional
     public FinancialRecordDto createFinancialRecord(Long dashboardId, FinancialRecordDto financialRecordDto) {
@@ -84,6 +109,15 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         return financialRecordMapper.toDto(savedRecord);
     }
 
+    /**
+     * Updates an existing financial record.
+     *
+     * @param id                   The ID of the financial record to update.
+     * @param dashboardId          The ID of the dashboard associated with the financial record.
+     * @param financialRecordDto The financial record DTO containing the updated data.
+     * @return The updated financial record DTO.
+     * @throws EntityNotFoundException If the financial record or category (if provided) is not found.
+     */
     @Override
     @Transactional
     public FinancialRecordDto updateFinancialRecord(Long id, Long dashboardId, FinancialRecordDto financialRecordDto) {
@@ -110,6 +144,13 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         return financialRecordMapper.toDto(updatedRecord);
     }
 
+    /**
+     * Deletes a financial record.
+     *
+     * @param id          The ID of the financial record to delete.
+     * @param dashboardId The ID of the dashboard associated with the financial record.
+     * @throws EntityNotFoundException If the financial record is not found.
+     */
     @Override
     @Transactional
     public void deleteFinancialRecord(Long id, Long dashboardId) {
@@ -120,4 +161,3 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         financialRecordRepository.delete(financialRecord);
     }
 }
-

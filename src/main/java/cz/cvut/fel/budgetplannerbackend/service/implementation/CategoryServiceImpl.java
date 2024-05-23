@@ -17,9 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
+/**
+ * Service class for managing categories.
+ */
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -33,6 +37,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
+    /**
+     * Retrieves all categories associated with a specific dashboard.
+     *
+     * @param dashboardId The ID of the dashboard.
+     * @return A list of Category DTOs representing the categories.
+     * @throws AccessDeniedException If the user does not have at least VIEWER access to the dashboard.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<CategoryDto> findAllCategoriesByDashboardId(Long dashboardId) {
@@ -44,6 +55,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    /**
+     * Retrieves a specific category by its ID and dashboard ID.
+     *
+     * @param id          The ID of the category.
+     * @param dashboardId The ID of the dashboard.
+     * @return The Category DTO representing the category.
+     * @throws EntityNotFoundException If the category is not found.
+     * @throws AccessDeniedException If the user does not have at least VIEWER access to the dashboard.
+     */
     @Override
     @Transactional(readOnly = true)
     public CategoryDto findCategoryByIdAndDashboardId(Long id, Long dashboardId) {
@@ -54,6 +74,15 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toDto(category);
     }
 
+    /**
+     * Creates a new category and associates it with a specific dashboard.
+     *
+     * @param dashboardId The ID of the dashboard to associate the category with.
+     * @param categoryDto The Category DTO containing the data for the new category.
+     * @return The Category DTO representing the created category.
+     * @throws EntityNotFoundException If the dashboard is not found.
+     * @throws AccessDeniedException If the user does not have at least EDITOR access to the dashboard.
+     */
     @Override
     @Transactional
     public CategoryDto createCategory(Long dashboardId, CategoryDto categoryDto) {
@@ -62,11 +91,21 @@ public class CategoryServiceImpl implements CategoryService {
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Dashboard", dashboardId));
         Category category = categoryMapper.toEntity(categoryDto);
-        category.setDashboard(dashboard);
+        category.setDashboard(dashboard); // Associate the category with the dashboard.
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toDto(savedCategory);
     }
 
+    /**
+     * Updates an existing category.
+     *
+     * @param dashboardId The ID of the dashboard associated with the category.
+     * @param id          The ID of the category to update.
+     * @param categoryDto The Category DTO containing the updated data for the category.
+     * @return The Category DTO representing the updated category.
+     * @throws EntityNotFoundException If the category is not found.
+     * @throws AccessDeniedException If the user does not have at least EDITOR access to the dashboard.
+     */
     @Override
     @Transactional
     public CategoryDto updateCategory(Long dashboardId, Long id, CategoryDto categoryDto) {
@@ -75,6 +114,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
 
+        // Update category fields if provided in the DTO
         if (categoryDto.name() != null) {
             category.setName(categoryDto.name());
         }
@@ -87,21 +127,34 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toDto(updatedCategory);
     }
 
+    /**
+     * Deletes a category and updates associated data.
+     *
+     * @param dashboardId The ID of the dashboard associated with the category.
+     * @param id          The ID of the category to delete.
+     * @throws EntityNotFoundException If the category is not found.
+     * @throws AccessDeniedException If the user does not have at least EDITOR access to the dashboard.
+     */
     @Override
     @Transactional
     public void deleteCategory(Long dashboardId, Long id) {
         securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Initiating deletion of category with id: {} for dashboard id: {}", id, dashboardId);
+
+        // Retrieve the category entity to be deleted.
         Category category = categoryRepository.findByIdAndDashboardId(id, dashboardId)
                 .orElseThrow(() -> new EntityNotFoundException("Category", id));
 
+        // Delete all category priorities associated with the category.
         LOG.info("Deleting all category priorities associated with category id: {}", id);
         categoryPriorityRepository.deleteByCategoryId(category.getId());
 
+        // Set the category_id to null for all financial records associated with the category.
         LOG.info("Setting category_id to null for all financial records associated with category id: {}", id);
         financialRecordRepository.setCategoryToNullByCategoryId(category.getId());
 
-        LOG.info("Category with id: {} successfully deleted, and all associated financial records are updated.", id);
+        // Delete the category entity itself.
         categoryRepository.delete(category);
+        LOG.info("Category with id: {} successfully deleted, and all associated financial records are updated.", id);
     }
 }

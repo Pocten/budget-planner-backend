@@ -15,7 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Utility class providing security-related operations and checks.
+ */
 @Component
 @RequiredArgsConstructor
 public class SecurityUtils {
@@ -24,6 +26,12 @@ public class SecurityUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityUtils.class);
 
+    /**
+     * Retrieves the currently authenticated user.
+     *
+     * @return The currently authenticated user.
+     * @throws IllegalStateException If no user is currently authenticated.
+     */
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails && userDetails instanceof CustomUserDetails customUserDetails) {
@@ -32,6 +40,12 @@ public class SecurityUtils {
         throw new IllegalStateException("No user is currently authenticated");
     }
 
+    /**
+     * Checks if the authenticated user is authorized to access resources for a specific user ID.
+     *
+     * @param userId The ID of the user whose resources are being accessed.
+     * @throws AccessDeniedException If the authenticated user is not authorized.
+     */
     public void checkAuthenticatedUser(Long userId) {
         User currentUser = getCurrentUser();
         if (!currentUser.getId().equals(userId)) {
@@ -41,6 +55,13 @@ public class SecurityUtils {
         LOG.info("User with id {} authorized successfully for access to user with id {}", currentUser.getId(), userId);
     }
 
+    /**
+     * Checks if the authenticated user has the required access level to a specific dashboard.
+     *
+     * @param dashboardId      The ID of the dashboard.
+     * @param minimumAccessLevel The minimum access level required.
+     * @throws AccessDeniedException If the user does not have the required access level.
+     */
     public void checkDashboardAccess(Long dashboardId, EAccessLevel minimumAccessLevel) {
         User currentUser = getCurrentUser();
         DashboardAccess access = dashboardAccessRepository.findByUserIdAndDashboardId(currentUser.getId(), dashboardId)

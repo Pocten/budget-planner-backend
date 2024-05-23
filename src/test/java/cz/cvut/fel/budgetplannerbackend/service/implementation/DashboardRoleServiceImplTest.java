@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -7,7 +7,6 @@ import cz.cvut.fel.budgetplannerbackend.entity.*;
 import cz.cvut.fel.budgetplannerbackend.entity.enums.ERole;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;
 import cz.cvut.fel.budgetplannerbackend.repository.*;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.DashboardRoleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

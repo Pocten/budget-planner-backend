@@ -100,7 +100,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userName\":\"admin\",\r\n    \"userPassword\":\"admin\"\r\n}",
+							"raw": "{\r\n    \"userName\":\"admin3\",\r\n    \"userPassword\": \"admin3\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -165,7 +165,7 @@
 					"response": []
 				},
 				{
-					"name": "Get User By Id",
+					"name": "Get User By ID",
 					"event": [
 						{
 							"listen": "test",
@@ -380,6 +380,174 @@
 			"name": "Dashboard",
 			"item": [
 				{
+					"name": "Members of dashboard",
+					"item": [
+						{
+							"name": "Add member to dashboard by userName or userEmail",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"usernameOrEmail\": \"admin2@example.com\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/{{lastDashboardId}}/members/add",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{lastUserId}}",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"members",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all members for dashboard",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/{{lastDashboardId}}/members",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{lastUserId}}",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"members"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change access level for specific member",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\"E\"",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/{{lastDashboardId}}/members/admin1/changeAccess",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{lastUserId}}",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"members",
+										"admin1",
+										"changeAccess"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete member from dashboard by userName or userEmail",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"usernameOrEmail\": \"admin2\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/{{lastDashboardId}}/members/remove",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{lastUserId}}",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"members",
+										"remove"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Get all dashboards of User",
 					"event": [
 						{
@@ -495,6 +663,38 @@
 					"response": []
 				},
 				{
+					"name": "Get accessible dashboards",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/accessible",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{lastUserId}}",
+								"dashboards",
+								"accessible"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create dashboard",
 					"event": [
 						{
@@ -554,6 +754,48 @@
 								"users",
 								"{{lastUserId}}",
 								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign role to user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"role\": \"STUDENT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/{{lastUserId}}/dashboards/{{lastDashboardId}}/assign-role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{lastUserId}}",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"assign-role"
 							]
 						}
 					},
@@ -737,6 +979,373 @@
 		{
 			"name": "Category",
 			"item": [
+				{
+					"name": "Category Priority",
+					"item": [
+						{
+							"name": "Category priority calculation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains a calculated priority value\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.a('number');\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities/calculate",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities",
+										"calculate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Getting all priorities for a specific category on the dashboard",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Getting all category priorities for the current user on the dashboard",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/priorities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"priorities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Getting the category priority for the current user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities/user",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Getting all priorities for the dashboard",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains a list of category priorities\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.an('array');\r",
+											"    if (jsonData.length > 0) {\r",
+											"        pm.expect(jsonData[0]).to.have.property('id');\r",
+											"        pm.expect(jsonData[0]).to.have.property('userId');\r",
+											"        pm.expect(jsonData[0]).to.have.property('categoryId');\r",
+											"        pm.expect(jsonData[0]).to.have.property('dashboardId');\r",
+											"        pm.expect(jsonData[0]).to.have.property('priority');\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/priorities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"priorities"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Creating a priority for a category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(201);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has category priority data\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property('id');\r",
+											"    pm.expect(jsonData).to.have.property('userId');\r",
+											"    pm.expect(jsonData).to.have.property('categoryId');\r",
+											"    pm.expect(jsonData).to.have.property('dashboardId');\r",
+											"    pm.expect(jsonData).to.have.property('priority');\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Устанавливаем значение переменной `priorityValue` на случайное число от 1 до 10\r",
+											"pm.environment.set(\"priorityValue\", Math.floor(Math.random() * 10) + 1);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities?priority={{priorityValue}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities"
+									],
+									"query": [
+										{
+											"key": "priority",
+											"value": "{{priorityValue}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Updating a priority for a category",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Устанавливаем значение переменной `priorityValue` на случайное число от 1 до 10\r",
+											"pm.environment.set(\"priorityValue\", Math.floor(Math.random() * 10) + 1);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities?priority={{priorityValue}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities"
+									],
+									"query": [
+										{
+											"key": "priority",
+											"value": "{{priorityValue}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deleting a priority for a category",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/categories/{{lastCategoryId}}/priorities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"dashboards",
+										"{{lastDashboardId}}",
+										"categories",
+										"{{lastCategoryId}}",
+										"priorities"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "Get all categories",
 					"event": [
@@ -1071,7 +1680,7 @@
 			"name": "Financial records",
 			"item": [
 				{
-					"name": "Get all financial records",
+					"name": "Get all financial records on Dashbord",
 					"event": [
 						{
 							"listen": "test",
@@ -1178,6 +1787,18 @@
 									"    var jsonData = pm.response.json();\r",
 									"    pm.environment.set('lastFinancialRecordId', jsonData.id); // Assuming ID is returned in the response\r",
 									"});\r",
+									"\r",
+									"pm.test(\"Response has financial record data\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('userId');\r",
+									"    pm.expect(jsonData).to.have.property('dashboard');\r",
+									"    pm.expect(jsonData).to.have.property('amount');\r",
+									"    pm.expect(jsonData).to.have.property('category');\r",
+									"    pm.expect(jsonData).to.have.property('type');\r",
+									"    pm.expect(jsonData).to.have.property('date');\r",
+									"    pm.expect(jsonData).to.have.property('description');\r",
+									"});\r",
 									""
 								],
 								"type": "text/javascript",
@@ -1211,7 +1832,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"amount\": {{randomAmount}},\r\n    \"description\": \"{{$randomLoremSentence}}\"\r\n}\r\n",
+							"raw": "{\r\n    \"amount\": {{randomAmount}},\r\n    \"description\": \"{{$randomLoremSentence}}\",\r\n    \"category\": {\r\n        \"id\": {{lastCategoryId}}\r\n    },\r\n    \"type\": \"INCOME\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1277,7 +1898,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"amount\": {{randomAmount}},\r\n    \"description\": \"{{$randomLoremSentence}}_updated\",\r\n    \"category\": {\r\n        \"id\": 2\r\n    },\r\n    \"tags\": [\r\n        {\"id\": 1},\r\n        {\"id\": 2},\r\n        {\"id\": 3}\r\n    ]\r\n}",
+							"raw": "{\r\n    \"amount\": {{randomAmount}},\r\n    \"description\": \"{{$randomLoremSentence}}_updated\",\r\n    \"category\": {\r\n        \"id\": {{lastCategoryId}}\r\n    },\r\n    \"tags\": [\r\n        {\"id\": {{lastTagId}}}\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1730,6 +2351,944 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Budget",
+			"item": [
+				{
+					"name": "Get all budgets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/budgets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"budgets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get budget by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/budgets/{{lastBudgetId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"budgets",
+								"{{lastBudgetId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create budget",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has budget ID\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"lastBudgetId\", jsonData.id);\r",
+									"});\r",
+									"\r",
+									"// Генерируем случайную дату начала в текущем году\r",
+									"function randomDate(start, end) {\r",
+									"    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));\r",
+									"}\r",
+									"\r",
+									"let today = new Date();\r",
+									"let startYear = new Date(today.getFullYear(), 0, 1); // 1 января текущего года\r",
+									"let endYear = new Date(today.getFullYear(), 11, 31); // 31 декабря текущего года\r",
+									"\r",
+									"let startDate = randomDate(startYear, endYear);\r",
+									"let endDate = randomDate(new Date(startDate.getTime() + 86400000), endYear); // Убедитесь, что endDate всегда позже startDate\r",
+									"\r",
+									"// Форматируем даты для использования в запросе\r",
+									"function formatDate(date) {\r",
+									"    let d = new Date(date),\r",
+									"        month = '' + (d.getMonth() + 1),\r",
+									"        day = '' + d.getDate(),\r",
+									"        year = d.getFullYear();\r",
+									"\r",
+									"    if (month.length < 2) \r",
+									"        month = '0' + month;\r",
+									"    if (day.length < 2) \r",
+									"        day = '0' + day;\r",
+									"\r",
+									"    return [year, month, day].join('-');\r",
+									"}\r",
+									"\r",
+									"// Устанавливаем переменные окружения\r",
+									"pm.environment.set(\"startDate\", formatDate(startDate));\r",
+									"pm.environment.set(\"endDate\", formatDate(endDate));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let totalAmount = (Math.random() * 100000).toFixed(2);\r",
+									"pm.environment.set(\"randomTotalAmount\", totalAmount);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"{{$randomLoremWords}}\",\r\n  \"totalAmount\": {{randomTotalAmount}},\r\n  \"startDate\": \"{{startDate}}\",\r\n  \"endDate\": \"{{endDate}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/budgets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"budgets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update budget by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 (OK) for PUT\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Генерируем случайную дату начала в текущем году\r",
+									"function randomDate(start, end) {\r",
+									"    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));\r",
+									"}\r",
+									"\r",
+									"let today = new Date();\r",
+									"let startYear = new Date(today.getFullYear(), 0, 1); // 1 января текущего года\r",
+									"let endYear = new Date(today.getFullYear(), 11, 31); // 31 декабря текущего года\r",
+									"\r",
+									"let startDate = randomDate(startYear, endYear);\r",
+									"let endDate = randomDate(new Date(startDate.getTime() + 86400000), endYear); // Убедитесь, что endDate всегда позже startDate\r",
+									"\r",
+									"// Форматируем даты для использования в запросе\r",
+									"function formatDate(date) {\r",
+									"    let d = new Date(date),\r",
+									"        month = '' + (d.getMonth() + 1),\r",
+									"        day = '' + d.getDate(),\r",
+									"        year = d.getFullYear();\r",
+									"\r",
+									"    if (month.length < 2) \r",
+									"        month = '0' + month;\r",
+									"    if (day.length < 2) \r",
+									"        day = '0' + day;\r",
+									"\r",
+									"    return [year, month, day].join('-');\r",
+									"}\r",
+									"\r",
+									"// Устанавливаем переменные окружения\r",
+									"pm.environment.set(\"startDate\", formatDate(startDate));\r",
+									"pm.environment.set(\"endDate\", formatDate(endDate));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let totalAmount = (Math.random() * 100000).toFixed(2);\r",
+									"pm.environment.set(\"randomTotalAmount\", totalAmount);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"{{$randomLoremWords}}_updated\",\r\n  \"totalAmount\": {{randomTotalAmount}},\r\n  \"startDate\": \"{{startDate}}\",\r\n  \"endDate\": \"{{endDate}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/budgets/{{lastBudgetId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"budgets",
+								"{{lastBudgetId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete budget by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204 (No Content) for DELETE\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/budgets/{{lastBudgetId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"budgets",
+								"{{lastBudgetId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{authToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"if (pm.environment.get('tokenExpiry') <= Date.now()) {\r",
+							"    // Token has expired, need to refresh\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.environment.get('baseUrl') + '/api/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: 'Content-Type:application/json',\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                userName: \"admin\",\r",
+							"                userPassword: \"admin\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function(err, res) {\r",
+							"        pm.environment.set('authToken', res.json().jwt);\r",
+							"        pm.environment.set('tokenExpiry', Date.now() + 3600000); // Set expiry 1 hour ahead\r",
+							"    });\r",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Financial goal",
+			"item": [
+				{
+					"name": "Get all financial goals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/financial-goals",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"financial-goals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get financial goal by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/financial-goals/{{goalId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"financial-goals",
+								"{{goalId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create financial goal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 201) {\r",
+									"    let responseData = pm.response.json();\r",
+									"    pm.environment.set('goalId', responseData.id);\r",
+									"}\r",
+									"\r",
+									"// Генерация случайного значения для targetAmount в диапазоне от 1000 до 10000\r",
+									"let targetAmount = (Math.random() * (10000 - 1000) + 1000).toFixed(2);\r",
+									"pm.environment.set(\"targetAmount\", targetAmount);\r",
+									"\r",
+									"// Генерация случайного значения для currentAmount, меньшего чем targetAmount\r",
+									"let currentAmount = (Math.random() * targetAmount).toFixed(2);\r",
+									"pm.environment.set(\"currentAmount\", currentAmount);\r",
+									"\r",
+									"// Генерация случайной даты deadline в будущем\r",
+									"let today = new Date();\r",
+									"let futureDate = new Date(today);\r",
+									"futureDate.setDate(today.getDate() + Math.floor(Math.random() * 365) + 1); // Случайное число дней от сегодняшнего дня до года вперед\r",
+									"let deadline = futureDate.toISOString().split('T')[0]; // Преобразование в формат YYYY-MM-DD\r",
+									"pm.environment.set(\"deadline\", deadline);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"{{$randomLoremWords}}\",\r\n    \"targetAmount\": {{targetAmount}},\r\n    \"currentAmount\": {{currentAmount}},\r\n    \"deadline\": \"{{deadline}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/financial-goals",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"financial-goals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update financial goal by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 (OK) for PUT\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Генерация случайного значения для targetAmount в диапазоне от 1000 до 10000\r",
+									"let targetAmount = (Math.random() * (10000 - 1000) + 1000).toFixed(2);\r",
+									"pm.environment.set(\"targetAmount\", targetAmount);\r",
+									"\r",
+									"// Генерация случайного значения для currentAmount, меньшего чем targetAmount\r",
+									"let currentAmount = (Math.random() * targetAmount).toFixed(2);\r",
+									"pm.environment.set(\"currentAmount\", currentAmount);\r",
+									"\r",
+									"// Генерация случайной даты deadline в будущем\r",
+									"let today = new Date();\r",
+									"let futureDate = new Date(today);\r",
+									"futureDate.setDate(today.getDate() + Math.floor(Math.random() * 365) + 1); // Случайное число дней от сегодняшнего дня до года вперед\r",
+									"let deadline = futureDate.toISOString().split('T')[0]; // Преобразование в формат YYYY-MM-DD\r",
+									"pm.environment.set(\"deadline\", deadline);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"{{$randomLoremWords}}_updated\",\r\n    \"targetAmount\": {{targetAmount}}\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/financial-goals{{goalId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"financial-goals{{goalId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete financial goal by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/financial-goals/{{goalId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"financial-goals",
+								"{{goalId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{authToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"if (pm.environment.get('tokenExpiry') <= Date.now()) {\r",
+							"    // Token has expired, need to refresh\r",
+							"    pm.sendRequest({\r",
+							"        url: pm.environment.get('baseUrl') + '/api/auth/login',\r",
+							"        method: 'POST',\r",
+							"        header: 'Content-Type:application/json',\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                userName: \"admin\",\r",
+							"                userPassword: \"admin\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function(err, res) {\r",
+							"        pm.environment.set('authToken', res.json().jwt);\r",
+							"        pm.environment.set('tokenExpiry', Date.now() + 3600000); // Set expiry 1 hour ahead\r",
+							"    });\r",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Invite Link",
+			"item": [
+				{
+					"name": "Create invite link",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Проверяем статус ответа\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Сохраняем URL пригласительной ссылки для следующего запроса\r",
+									"pm.test(\"Save invite link URL for activation\", function() {\r",
+									"    var responseData = pm.response.json();\r",
+									"    pm.environment.set(\"inviteLinkUrl\", responseData.link); // предполагаем, что ответ содержит URL\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Генерируем дату истечения ссылки, добавляя 30 дней к текущей дате\r",
+									"const today = new Date();\r",
+									"const expiryDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));\r",
+									"const expiryDateString = expiryDate.toISOString();\r",
+									"\r",
+									"// Сохраняем сгенерированную дату в переменную окружения\r",
+									"pm.environment.set(\"expiryDate\", expiryDateString);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/invite-links",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"invite-links"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate link",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/invite-links/activate/{{inviteLinkUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"invite-links",
+								"activate",
+								"{{inviteLinkUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate link",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/invite-links/deactivate/{{inviteLinkUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"invite-links",
+								"deactivate",
+								"{{inviteLinkUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Use link",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest({\r",
+									"    url: pm.variables.get('baseUrl') + '/api/auth/login',\r",
+									"    method: 'POST',\r",
+									"    headers: {\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"            userName: \"admin2\",\r",
+									"            userPassword: \"admin2\"\r",
+									"        })\r",
+									"    }\r",
+									"}, function (err, response) {\r",
+									"    if (err) {\r",
+									"        console.log(err); // Логирование ошибки для дебага\r",
+									"    } else {\r",
+									"        try {\r",
+									"            var responseData = JSON.parse(response.text());\r",
+									"            pm.environment.set('authToken', responseData.jwt); // Сохраняем JWT токен авторизации\r",
+									"        } catch (e) {\r",
+									"            console.log(\"Error parsing response: \", e);\r",
+									"        }\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Проверяем статус ответа\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/dashboards/{{lastDashboardId}}/invite-links/use/{{inviteLinkUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboards",
+								"{{lastDashboardId}}",
+								"invite-links",
+								"use",
+								"{{inviteLinkUrl}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

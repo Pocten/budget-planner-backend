@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.dto.CategoryDto;
 import cz.cvut.fel.budgetplannerbackend.dto.DashboardDto;
@@ -14,7 +14,6 @@ import cz.cvut.fel.budgetplannerbackend.repository.CategoryRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.FinancialRecordRepository;
 import cz.cvut.fel.budgetplannerbackend.security.utils.SecurityUtils;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.FinancialRecordServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

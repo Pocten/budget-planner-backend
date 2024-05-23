@@ -1,4 +1,4 @@
-package cz.cvut.fel.budgetplannerbackend.unitTests.service.implementation;
+package cz.cvut.fel.budgetplannerbackend.service.implementation;
 
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardAccessRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRoleRepository;
@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import cz.cvut.fel.budgetplannerbackend.entity.User;
 import cz.cvut.fel.budgetplannerbackend.repository.DashboardRepository;
 import cz.cvut.fel.budgetplannerbackend.repository.UserRepository;
-import cz.cvut.fel.budgetplannerbackend.service.implementation.UserServiceImpl;
 import cz.cvut.fel.budgetplannerbackend.dto.UserDto;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityAlreadyExistsException;
 import cz.cvut.fel.budgetplannerbackend.exceptions.EntityNotFoundException;

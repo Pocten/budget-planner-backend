@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Service class for managing users.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -35,6 +38,11 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    /**
+     * Retrieves a list of all users.
+     *
+     * @return A list of all users.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
@@ -46,16 +54,30 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return The user with the specified ID.
+     * @throws EntityNotFoundException If no user with the specified ID is found.
+     */
     @Override
     @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
         LOG.info("Getting user with id: {}", id);
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("User", id));
-            LOG.info("Returned user with id: {}", id);
-            return userMapper.toDto(user);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User", id));
+        LOG.info("Returned user with id: {}", id);
+        return userMapper.toDto(user);
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param userDto The DTO object containing the user's information.
+     * @return The created user.
+     * @throws EntityAlreadyExistsException If a user with the same username or email already exists.
+     */
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) throws EntityAlreadyExistsException {
@@ -74,6 +96,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(savedUser);
     }
 
+    /**
+     * Updates an existing user.
+     *
+     * @param id       The ID of the user to update.
+     * @param userDto The DTO object containing the updated user's information.
+     * @return The updated user.
+     * @throws EntityNotFoundException If no user with the specified ID is found.
+     */
     @Override
     @Transactional
     public UserDto updateUser(Long id, UserDto userDto) {
@@ -95,7 +125,12 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-
+    /**
+     * Deletes a user.
+     *
+     * @param id The ID of the user to delete.
+     * @throws EntityNotFoundException If no user with the specified ID is found.
+     */
     @Override
     @Transactional
     public void deleteUser(Long id) {
