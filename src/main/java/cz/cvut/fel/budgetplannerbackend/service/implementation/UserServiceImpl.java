@@ -109,11 +109,11 @@ public class UserServiceImpl implements UserService {
                 dashboardService.deleteDashboard(id, dashboard.getId());
             }
 
-            // Удаление доступа к дашбордам, связанных с пользователем
+            // Deleting access to dashboards associated with a user
             LOG.info("Deleting dashboard accesses associated with user id: {}", id);
             dashboardAccessRepository.deleteByUserId(id);
 
-            // Удаление ролей пользователя в дашбордах
+            // Deleting user roles in dashboards
             LOG.info("Deleting dashboard roles associated with user id: {}", id);
             dashboardRoleRepository.deleteByUserId(id);
 

@@ -246,6 +246,7 @@ public class DashboardServiceImpl implements DashboardService {
     public void changeAccessLevel(Long dashboardId, String usernameOrEmail, Long userId, EAccessLevel newAccessLevelEnum) throws Exception {
         securityUtils.checkDashboardAccess(dashboardId, EAccessLevel.EDITOR);
         LOG.info("Attempting to change access level for a member on dashboard {}", dashboardId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
@@ -255,11 +256,17 @@ public class DashboardServiceImpl implements DashboardService {
         User userToChangeAccess = userRepository.findUserByUserNameOrUserEmail(usernameOrEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username/email: " + usernameOrEmail));
 
+        // Check if the user to change is the dashboard owner
+        if (dashboard.getUser().getId().equals(userToChangeAccess.getId())) {
+            LOG.error("User {} attempted to change access level of the dashboard owner on dashboard {}", userId, dashboardId);
+            throw new AccessDeniedException("Cannot change access level of the dashboard owner.");
+        }
+
         Optional<DashboardAccess> access = dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId);
         if (access.isPresent()) {
             EAccessLevel currentAccessLevel = access.get().getAccessLevel().getLevel();
-            if (currentAccessLevel == EAccessLevel.NONE || (currentAccessLevel == EAccessLevel.OWNER && userToChangeAccess.getId().equals(userId))) {
-                LOG.error("User {} attempted to change own access level or change to OWNER on dashboard {}", userId, dashboardId);
+            if (currentAccessLevel == EAccessLevel.NONE) {
+                LOG.error("User {} with NONE access level attempted to change access level on dashboard {}", userId, dashboardId);
                 throw new AccessDeniedException("Insufficient permissions to change access levels.");
             }
 
@@ -281,6 +288,7 @@ public class DashboardServiceImpl implements DashboardService {
             throw new AccessDeniedException("User not found on dashboard.");
         }
     }
+
 
     @Override
     @Transactional
