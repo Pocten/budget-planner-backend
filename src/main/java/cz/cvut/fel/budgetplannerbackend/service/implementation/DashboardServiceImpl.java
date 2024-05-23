@@ -307,11 +307,25 @@ public class DashboardServiceImpl implements DashboardService {
         // Check if the user to remove is the owner
         Optional<DashboardAccess> userToRemoveAccess = dashboardAccessRepository.findByUserIdAndDashboardId(userToRemove.getId(), dashboardId);
         if (userToRemoveAccess.isPresent() && userToRemoveAccess.get().getAccessLevel().getLevel() == EAccessLevel.OWNER) {
+            if (userToRemove.getId().equals(userId)) {
+                LOG.error("User {} attempted to remove self as OWNER from dashboard {}", userId, dashboardId);
+                throw new AccessDeniedException("The owner of the dashboard cannot remove themselves.");
+            }
             LOG.error("User {} attempted to remove the owner of dashboard {}", userId, dashboardId);
             throw new AccessDeniedException("The owner of the dashboard cannot be removed.");
         }
 
-        // Check if the user attempting to remove has NONE access level
+        // Allow user to remove themselves if they are not the owner
+        if (userToRemove.getId().equals(userId)) {
+            dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId)
+                    .ifPresent(da -> {
+                        dashboardAccessRepository.delete(da);
+                        LOG.info("User {} removed themselves from dashboard {}", userId, dashboardId);
+                    });
+            return;
+        }
+
+        // Check if the user attempting to remove others has NONE access level
         Optional<DashboardAccess> access = dashboardAccessRepository.findByUserIdAndDashboardId(userId, dashboardId);
         if (access.isPresent() && access.get().getAccessLevel().getLevel() == EAccessLevel.NONE) {
             LOG.error("User {} attempted to remove member with NONE access level on dashboard {}", userId, dashboardId);
