@@ -31,11 +31,13 @@ CREATE TABLE dashboards (
 
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
     description VARCHAR(500),
     dashboard_id BIGINT NOT NULL,
-    FOREIGN KEY (dashboard_id) REFERENCES dashboards(id)
+    FOREIGN KEY (dashboard_id) REFERENCES dashboards(id),
+    UNIQUE (name, dashboard_id)
 );
+
 
 CREATE TABLE financial_records (
     id BIGSERIAL PRIMARY KEY,
